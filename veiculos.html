@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Veículos - Oficina Pro</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+<div class="sidebar-logo"><h2>🔧 OFICINA PRO</h2></div>
+<nav class="sidebar-menu">
+<a href="dashboard.html">📊 Dashboard</a>
+<a href="clientes.html">👥 Clientes</a>
+<a href="veiculos.html" class="active">🚗 Veículos</a>
+<a href="ordens.html">🔧 Ordens de Serviço</a>
+<a href="estoque.html">📦 Estoque</a>
+<a href="financeiro.html">💰 Financeiro</a>
+<a href="agenda.html">📅 Agenda</a>
+<a href="usuarios.html">⚙️ Usuários</a>
+<a href="#" onclick="sair();return false" class="logout">🚪 Sair</a>
+</nav>
+</aside>
+
+<main class="main">
+<div class="topbar">
+<div>
+<h1>Veículos</h1>
+<p>Cadastre os veículos e vincule cada um ao seu cliente</p>
+</div>
+<div class="user-info">👤 Administrador</div>
+</div>
+
+<div class="content-box">
+<div class="content-header"><h2>Novo veículo</h2></div>
+
+<form id="formCadastro" class="form-grid">
+<div class="form-group">
+<label for="placa">Placa *</label>
+<input id="placa" required placeholder="ABC-1D23" maxlength="8">
+</div>
+
+<div class="form-group">
+<label for="marca">Marca *</label>
+<input id="marca" required placeholder="Ex.: Volkswagen">
+</div>
+
+<div class="form-group">
+<label for="modelo">Modelo *</label>
+<input id="modelo" required placeholder="Ex.: Gol">
+</div>
+
+<div class="form-group">
+<label for="ano">Ano</label>
+<input id="ano" type="number" min="1950" max="2100" placeholder="2022">
+</div>
+
+<div class="form-group">
+<label for="cor">Cor</label>
+<input id="cor" placeholder="Ex.: Prata">
+</div>
+
+<div class="form-group">
+<label for="quilometragem">Quilometragem</label>
+<input id="quilometragem" type="number" min="0" placeholder="50000">
+</div>
+
+<div class="form-group">
+<label for="combustivel">Combustível</label>
+<select id="combustivel">
+<option value="">Selecione</option>
+<option>Flex</option><option>Gasolina</option><option>Etanol</option>
+<option>Diesel</option><option>Híbrido</option><option>Elétrico</option>
+</select>
+</div>
+
+<div class="form-group">
+<label for="clienteId">Cliente *</label>
+<select id="clienteId" required></select>
+</div>
+
+<button class="btn btn-blue" type="submit">+ Cadastrar veículo</button>
+</form>
+</div>
+
+<div class="content-box page-list">
+<div class="content-header">
+<div>
+<h2>Veículos cadastrados</h2>
+<p class="table-subtitle" id="contador">0 veículos</p>
+</div>
+<input class="table-search" id="busca" placeholder="🔎 Buscar placa, modelo ou cliente...">
+</div>
+
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>#</th><th>Placa</th><th>Veículo</th><th>Ano</th><th>Quilometragem</th><th>Cliente</th><th>Ações</th>
+</tr>
+</thead>
+<tbody id="lista"></tbody>
+</table>
+</div>
+</div>
+</main>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script>
+const STORAGE = "veiculos";
+const form = document.getElementById("formCadastro");
+const lista = document.getElementById("lista");
+const busca = document.getElementById("busca");
+const contador = document.getElementById("contador");
+const clienteSelect = document.getElementById("clienteId");
+const campos = ["placa","marca","modelo","ano","cor","quilometragem","combustivel","clienteId"];
+let editandoId = null;
+
+function ler(chave) {
+    try { return JSON.parse(localStorage.getItem(chave)) || []; }
+    catch { return []; }
+}
+function salvar(a) { localStorage.setItem(STORAGE, JSON.stringify(a)); }
+
+function escapar(valor) {
+    return String(valor ?? "").replace(/[&<>"']/g, c => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+    }[c]));
+}
+
+function carregarClientes(clienteAtual = "") {
+    const clientes = ler("clientes").sort((a,b) => String(a.nome).localeCompare(String(b.nome)));
+    clienteSelect.innerHTML = '<option value="">Selecione um cliente</option>';
+    clientes.forEach(c => {
+        const op = document.createElement("option");
+        op.value = c.id;
+        op.textContent = c.nome;
+        if (String(c.id) === String(clienteAtual)) op.selected = true;
+        clienteSelect.appendChild(op);
+    });
+    if (!clientes.length) {
+        clienteSelect.innerHTML = '<option value="">Cadastre um cliente primeiro</option>';
+    }
+}
+
+function nomeCliente(id) {
+    const c = ler("clientes").find(x => String(x.id) === String(id));
+    return c ? c.nome : "Cliente não encontrado";
+}
+
+function render() {
+    const todos = ler(STORAGE);
+    const termo = busca.value.toLowerCase().trim();
+    const filtrados = todos.filter(v => {
+        const texto = [v.placa,v.marca,v.modelo,v.ano,nomeCliente(v.clienteId)].join(" ");
+        return texto.toLowerCase().includes(termo);
+    });
+
+    contador.textContent = `${todos.length} ${todos.length === 1 ? "veículo" : "veículos"}`;
+    lista.innerHTML = "";
+
+    if (!filtrados.length) {
+        lista.innerHTML = `<tr><td colspan="7" class="empty-state">Nenhum veículo encontrado.</td></tr>`;
+        return;
+    }
+
+    filtrados.forEach((item, i) => {
+        const indice = todos.findIndex(x => x.id === item.id);
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${i + 1}</td>
+            <td><strong class="placa-badge">${escapar(item.placa)}</strong></td>
+            <td>${escapar(item.marca)} ${escapar(item.modelo)}</td>
+            <td>${escapar(item.ano)}</td>
+            <td>${item.quilometragem ? Number(item.quilometragem).toLocaleString("pt-BR") + " km" : "—"}</td>
+            <td>${escapar(nomeCliente(item.clienteId))}</td>
+            <td class="actions">
+                <button class="btn-small btn-edit" onclick="editar(${item.id})">Editar</button>
+                <button class="btn-danger" onclick="excluir(${indice})">Excluir</button>
+            </td>`;
+        lista.appendChild(tr);
+    });
+}
+
+function limparFormulario() {
+    form.reset();
+    carregarClientes();
+    editandoId = null;
+    form.querySelector("button[type=submit]").textContent = "+ Cadastrar veículo";
+    document.querySelector(".content-header h2").textContent = "Novo veículo";
+}
+
+form.addEventListener("submit", e => {
+    e.preventDefault();
+    if (!ler("clientes").length) {
+        alert("Cadastre pelo menos um cliente antes de cadastrar um veículo.");
+        return;
+    }
+
+    const todos = ler(STORAGE);
+    const item = {};
+    campos.forEach(c => item[c] = document.getElementById(c).value.trim());
+
+    const placaNormalizada = item.placa.toUpperCase().replace(/[^A-Z0-9]/g,"");
+    const duplicado = todos.find(v =>
+        v.id !== editandoId &&
+        String(v.placa).toUpperCase().replace(/[^A-Z0-9]/g,"") === placaNormalizada
+    );
+    if (duplicado) {
+        alert("Já existe um veículo cadastrado com essa placa.");
+        return;
+    }
+    item.placa = item.placa.toUpperCase();
+
+    if (editandoId !== null) {
+        const index = todos.findIndex(x => x.id === editandoId);
+        if (index >= 0) todos[index] = {...todos[index], ...item};
+    } else {
+        item.id = Date.now();
+        item.criadoEm = new Date().toISOString();
+        todos.push(item);
+    }
+
+    salvar(todos);
+    limparFormulario();
+    render();
+});
+
+function editar(id) {
+    const item = ler(STORAGE).find(x => x.id === id);
+    if (!item) return;
+    carregarClientes(item.clienteId);
+    campos.forEach(c => document.getElementById(c).value = item[c] || "");
+    editandoId = id;
+    form.querySelector("button[type=submit]").textContent = "Salvar alterações";
+    document.querySelector(".content-header h2").textContent = "Editar veículo";
+    window.scrollTo({top: 0, behavior: "smooth"});
+}
+
+function excluir(indice) {
+    const todos = ler(STORAGE);
+    const item = todos[indice];
+    if (!item) return;
+    if (!confirm(`Excluir o veículo "${item.marca} ${item.modelo} - ${item.placa}"?`)) return;
+    todos.splice(indice, 1);
+    salvar(todos);
+    render();
+}
+
+document.getElementById("placa").addEventListener("input", e => {
+    e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g,"").slice(0,8);
+});
+
+busca.addEventListener("input", render);
+window.addEventListener("storage", e => {
+    if (e.key === "clientes") {
+        carregarClientes();
+        render();
+    }
+});
+
+carregarClientes();
+render();
+</script>
+</body>
+</html>

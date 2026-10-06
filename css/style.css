@@ -1,0 +1,971 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f6f9;
+    color: #222;
+}
+
+
+/* =========================================================
+   LOGIN
+   ========================================================= */
+
+.login-body {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background: #111827;
+}
+
+.login-container {
+    width: 100%;
+    max-width: 400px;
+    background: #fff;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, .3);
+}
+
+.login-logo {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.logo-icon {
+    font-size: 50px;
+    margin-bottom: 10px;
+}
+
+.login-logo h1 {
+    font-size: 26px;
+    color: #111827;
+}
+
+.login-logo p {
+    margin-top: 7px;
+    color: #777;
+    font-size: 14px;
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 7px;
+    font-weight: bold;
+    color: #333;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    outline: none;
+    font-size: 15px;
+}
+
+.input-group input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .1);
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 13px;
+    border: none;
+    border-radius: 8px;
+    background: #2563eb;
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    background: #1d4ed8;
+}
+
+#loginMensagem {
+    min-height: 20px;
+    margin-top: 15px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.login-info {
+    margin-top: 25px;
+    padding: 12px;
+    background: #f3f4f6;
+    border-radius: 8px;
+    text-align: center;
+    color: #666;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   ESTRUTURA PRINCIPAL
+   ========================================================= */
+
+.layout {
+    min-height: 100vh;
+    display: flex;
+}
+
+.sidebar {
+    width: 250px;
+    flex-shrink: 0;
+    background: #111827;
+    color: #fff;
+    min-height: 100vh;
+}
+
+.sidebar-logo {
+    padding: 25px 20px;
+    border-bottom: 1px solid #374151;
+}
+
+.sidebar-logo h2 {
+    font-size: 19px;
+}
+
+.sidebar-menu {
+    display: flex;
+    flex-direction: column;
+    padding: 15px 10px;
+}
+
+.sidebar-menu a {
+    color: #d1d5db;
+    text-decoration: none;
+    padding: 14px 15px;
+    border-radius: 8px;
+    margin-bottom: 5px;
+    transition: .2s;
+}
+
+.sidebar-menu a:hover,
+.sidebar-menu a.active {
+    background: #2563eb;
+    color: #fff;
+}
+
+.sidebar-menu .logout {
+    margin-top: 20px;
+    cursor: pointer;
+    background: #374151;
+}
+
+
+/* =========================================================
+   CONTEÚDO
+   ========================================================= */
+
+.main {
+    flex: 1;
+    min-width: 0;
+    padding: 30px;
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.topbar h1 {
+    color: #111827;
+}
+
+.user-info {
+    color: #4b5563;
+    font-weight: bold;
+}
+
+
+/* =========================================================
+   CARDS DO DASHBOARD
+   ========================================================= */
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.card {
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, .07);
+}
+
+.card-title {
+    color: #6b7280;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.card-value {
+    color: #111827;
+    font-size: 32px;
+    font-weight: bold;
+}
+
+
+/* =========================================================
+   CAIXAS DE CONTEÚDO
+   ========================================================= */
+
+.content-box {
+    background: #fff;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, .07);
+}
+
+.content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.content-header h2 {
+    color: #111827;
+}
+
+
+/* =========================================================
+   BOTÕES
+   ========================================================= */
+
+.btn {
+    display: inline-block;
+    padding: 10px 16px;
+    border-radius: 7px;
+    text-decoration: none;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-blue {
+    background: #2563eb;
+    color: #fff;
+}
+
+.btn-blue:hover {
+    background: #1d4ed8;
+}
+
+.btn-danger {
+    background: #dc2626;
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-danger:hover {
+    background: #b91c1c;
+}
+
+
+/* =========================================================
+   FORMULÁRIOS
+   ========================================================= */
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    align-items: end;
+}
+
+.form-group {
+    width: 100%;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 7px;
+    font-weight: 600;
+    color: #333;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    height: 44px;
+    box-sizing: border-box;
+    padding: 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: #fff;
+    font-size: 15px;
+    outline: none;
+}
+
+.form-group textarea {
+    height: auto;
+    min-height: 100px;
+    resize: vertical;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .1);
+}
+
+.form-grid > .btn,
+.form-grid > button {
+    width: fit-content;
+    min-width: 150px;
+    height: 44px;
+    align-self: end;
+}
+
+
+/* =========================================================
+   CAMPOS MONETÁRIOS
+   ========================================================= */
+
+input#valor,
+input#preco,
+input#total {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* =========================================================
+   TABELAS
+   ========================================================= */
+
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.table-container table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 14px;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+    vertical-align: middle;
+}
+
+th {
+    color: #374151;
+    background: #f9fafb;
+}
+
+
+/* =========================================================
+   COLUNA DE VALORES
+   ========================================================= */
+
+.valor-monetario,
+.valor,
+.preco,
+.total,
+td.valor,
+td.preco,
+td.total,
+.coluna-valor {
+    text-align: right !important;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+th.coluna-valor {
+    text-align: right !important;
+}
+
+
+/* =========================================================
+   COLUNA DE AÇÕES
+   ========================================================= */
+
+.table-container th:last-child,
+.table-container td:last-child {
+    white-space: nowrap;
+}
+
+.table-container .btn-danger {
+    white-space: nowrap;
+    min-width: 85px;
+}
+
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+.status {
+    display: inline-block;
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.status-yellow {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+
+/* =========================================================
+   MENSAGEM DE USUÁRIO
+   ========================================================= */
+
+#mensagemUsuario {
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   RESPONSIVO - 900PX
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    .cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .sidebar {
+        width: 210px;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVO - 800PX
+   ========================================================= */
+
+@media (max-width: 800px) {
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-grid > .btn,
+    .form-grid > button {
+        width: 100%;
+    }
+
+    .table-container {
+        overflow-x: auto;
+    }
+
+    .table-container table {
+        min-width: 650px;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVO - 650PX
+   ========================================================= */
+
+@media (max-width: 650px) {
+
+    .layout {
+        display: block;
+    }
+
+    .sidebar {
+        width: 100%;
+        min-height: auto;
+    }
+
+    .sidebar-menu {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .sidebar-menu a {
+        margin: 3px;
+    }
+
+    .main {
+        padding: 20px;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVO - 500PX
+   ========================================================= */
+
+@media (max-width: 500px) {
+
+    .login-container {
+        padding: 30px 20px;
+    }
+
+    .login-logo h1 {
+        font-size: 23px;
+    }
+
+    .cards {
+        grid-template-columns: 1fr;
+    }
+
+    .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+}
+
+
+
+/* =========================================================
+   MELHORIAS - CLIENTES E VEÍCULOS
+   ========================================================= */
+
+.table-search {
+    width: min(320px, 100%);
+    height: 42px;
+    box-sizing: border-box;
+    padding: 10px 13px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    outline: none;
+    font-size: 14px;
+}
+
+.table-search:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .1);
+}
+
+.table-subtitle {
+    margin: 5px 0 0;
+    color: #6b7280;
+    font-size: 13px;
+}
+
+.actions {
+    display: flex;
+    gap: 7px;
+    align-items: center;
+}
+
+.btn-small {
+    border: none;
+    padding: 8px 11px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn-edit {
+    background: #e0e7ff;
+    color: #3730a3;
+}
+
+.btn-edit:hover {
+    background: #c7d2fe;
+}
+
+.empty-state {
+    text-align: center !important;
+    padding: 30px !important;
+    color: #6b7280;
+}
+
+.placa-badge {
+    display: inline-block;
+    background: #f3f4f6;
+    border: 1px solid #d1d5db;
+    padding: 5px 9px;
+    border-radius: 5px;
+    letter-spacing: .5px;
+}
+
+@media (max-width: 800px) {
+    .content-header {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .table-search {
+        width: 100%;
+    }
+
+    .actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+
+/* =========================================================
+   MELHORIAS - ORDENS DE SERVIÇO
+   ========================================================= */
+.form-section {
+    border-top: 1px solid #e5e7eb;
+    padding: 22px 0 4px;
+    margin-top: 6px;
+}
+.form-section:first-of-type { border-top: 0; padding-top: 4px; }
+.form-section h3 { margin: 0 0 16px; font-size: 16px; color: #1f2937; }
+.form-section .full { grid-column: 1 / -1; }
+.form-section textarea {
+    width: 100%;
+    box-sizing: border-box;
+    resize: vertical;
+    padding: 11px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font: inherit;
+    outline: none;
+}
+.form-section textarea:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.1); }
+.section-title-row { display:flex; justify-content:space-between; align-items:center; gap:15px; margin-bottom:14px; }
+.btn-light { background:#f3f4f6; color:#374151; border:1px solid #d1d5db; }
+.btn-light:hover { background:#e5e7eb; }
+.os-number { font-weight:700; color:#2563eb; background:#eff6ff; padding:8px 12px; border-radius:7px; white-space:nowrap; }
+.item-row {
+    display:grid;
+    grid-template-columns: minmax(220px, 2fr) 90px 140px 140px 38px;
+    gap:10px;
+    align-items:end;
+    padding:12px;
+    margin-bottom:10px;
+    background:#f9fafb;
+    border:1px solid #e5e7eb;
+    border-radius:9px;
+}
+.item-row label { display:block; font-size:12px; color:#6b7280; margin-bottom:5px; }
+.item-row input {
+    width:100%;
+    box-sizing:border-box;
+    padding:9px 10px;
+    border:1px solid #d1d5db;
+    border-radius:7px;
+    background:white;
+}
+.item-total { display:block; padding:9px 0; white-space:nowrap; }
+.btn-remove {
+    width:34px; height:34px; border:0; border-radius:7px;
+    background:#fee2e2; color:#b91c1c; font-size:22px; cursor:pointer;
+}
+.btn-remove:hover { background:#fecaca; }
+.totais-grid {
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:14px;
+}
+.totais-grid > div {
+    background:#f9fafb;
+    border:1px solid #e5e7eb;
+    border-radius:8px;
+    padding:14px;
+}
+.totais-grid span { display:block; color:#6b7280; font-size:13px; margin-bottom:7px; }
+.totais-grid strong { font-size:17px; }
+.totais-grid input { width:100%; box-sizing:border-box; padding:8px; border:1px solid #d1d5db; border-radius:6px; }
+.totais-grid .total-final { background:#eff6ff; border-color:#bfdbfe; }
+.totais-grid .total-final strong { color:#1d4ed8; font-size:20px; }
+.form-actions { display:flex; justify-content:flex-end; gap:10px; padding-top:20px; margin-top:15px; border-top:1px solid #e5e7eb; }
+.btn-secondary { background:#f3f4f6; color:#374151; border:1px solid #d1d5db; }
+.status-gray { background:#f3f4f6; color:#4b5563; }
+.status-blue { background:#dbeafe; color:#1d4ed8; }
+.status-orange { background:#ffedd5; color:#c2410c; }
+.status-green { background:#dcfce7; color:#15803d; }
+.status-yellow { background:#fef3c7; color:#a16207; }
+@media (max-width:900px) {
+    .item-row { grid-template-columns:1fr 80px 120px; }
+    .item-row .item-total { grid-column:2; }
+    .item-row .btn-remove { grid-column:3; grid-row:2; justify-self:end; }
+    .totais-grid { grid-template-columns:repeat(2,1fr); }
+}
+@media (max-width:600px) {
+    .section-title-row { align-items:stretch; flex-direction:column; }
+    .item-row { grid-template-columns:1fr 1fr; }
+    .item-row .item-description { grid-column:1/-1; }
+    .item-row .item-total { grid-column:1; }
+    .item-row .btn-remove { grid-column:2; grid-row:auto; }
+    .totais-grid { grid-template-columns:1fr; }
+    .form-actions { flex-direction:column; }
+}
+
+
+/* =========================================================
+   MELHORIAS - ESTOQUE
+   ========================================================= */
+.stock-cards {
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:16px;
+    margin-bottom:20px;
+}
+.stock-card {
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:10px;
+    padding:18px;
+    box-shadow:0 1px 2px rgba(0,0,0,.03);
+}
+.stock-card span {display:block;color:#6b7280;font-size:13px;margin-bottom:8px}
+.stock-card strong {font-size:26px;color:#111827}
+.stock-card.danger {border-color:#fecaca}
+.stock-status {
+    display:inline-block;
+    padding:5px 9px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:700;
+}
+.stock-ok {background:#dcfce7;color:#15803d}
+.stock-low {background:#fef3c7;color:#a16207}
+.stock-critical {background:#fee2e2;color:#b91c1c}
+.btn-entry {background:#dcfce7;color:#166534}
+.btn-exit {background:#fee2e2;color:#991b1b}
+@media(max-width:1000px){.stock-cards{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.stock-cards{grid-template-columns:1fr}}
+
+
+/* =========================================================
+   FINANCEIRO
+   ========================================================= */
+
+.finance-filter {
+    margin-bottom: 20px;
+}
+
+.finance-filter-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 15px;
+    align-items: end;
+}
+
+.finance-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.finance-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,.07);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.finance-card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    background: #f3f4f6;
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.finance-card span {
+    display: block;
+    color: #6b7280;
+    font-size: 13px;
+    margin-bottom: 6px;
+}
+
+.finance-card strong {
+    display: block;
+    color: #111827;
+    font-size: 22px;
+}
+
+.finance-grid-two {
+    display: grid;
+    grid-template-columns: 1fr 1.25fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.cash-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.cash-summary div {
+    background: #f9fafb;
+    border-radius: 8px;
+    padding: 14px;
+}
+
+.cash-summary span {
+    display: block;
+    color: #6b7280;
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+.cash-summary strong {
+    color: #111827;
+}
+
+.finance-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.bar-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 7px;
+    color: #374151;
+    font-size: 13px;
+}
+
+.bar-track {
+    height: 10px;
+    background: #e5e7eb;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.bar-fill {
+    height: 100%;
+    width: 0;
+    border-radius: 20px;
+    transition: width .3s ease;
+}
+
+.bar-fill.entrada {
+    background: #16a34a;
+}
+
+.bar-fill.saida {
+    background: #dc2626;
+}
+
+.finance-highlight {
+    font-size: 20px;
+}
+
+.finance-type {
+    display: inline-block;
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.finance-type.entrada {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.finance-type.saida {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.finance-client {
+    display: block;
+    color: #6b7280;
+    margin-top: 3px;
+    font-size: 12px;
+}
+
+@media (max-width: 1000px) {
+    .finance-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .finance-grid-two {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 800px) {
+    .finance-filter-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 500px) {
+    .finance-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .cash-summary {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+.btn-doc{background:#eef2ff;color:#3730a3;border:1px solid #c7d2fe}
+.btn-receipt{background:#fff7ed;color:#9a3412;border:1px solid #fed7aa}
+.btn-whatsapp{background:#ecfdf5;color:#166534;border:1px solid #bbf7d0}
+.actions{white-space:nowrap}
+.actions button{margin:2px}
+
+/* OFICINA PRO v7 */
+.v7-kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin:18px 0}
+.v7-kpi{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:16px;box-shadow:0 4px 14px rgba(0,0,0,.04)}
+.v7-kpi span{display:block;color:#6b7280;font-size:13px;margin-bottom:7px}.v7-kpi strong{font-size:20px}
+.v7-grid-two{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}.v7-agenda-list p{padding:9px 0;border-bottom:1px solid #f0f0f0;margin:0}.v7-agenda-list span{color:#6b7280;margin-left:5px}.v7-shortcuts{display:flex;flex-wrap:wrap;gap:10px}
+.status-badge{display:inline-block;padding:4px 9px;border-radius:999px;background:#eef2ff;color:#3730a3;font-size:12px}
+@media(max-width:1100px){.v7-kpi-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:750px){.v7-kpi-grid,.v7-grid-two{grid-template-columns:1fr}.v7-kpi-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.v7-kpi-grid{grid-template-columns:1fr}}
+
+/* Itens de OS vinculados ao estoque */
+.item-description .item-produto{width:100%;margin-bottom:6px}
+.item-description .item-nome{width:100%}
+.estoque-disponivel{display:block;margin-top:4px;color:#6b7280;font-size:11px}

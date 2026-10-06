@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estoque - Oficina Pro</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+<div class="sidebar-logo"><h2>🔧 OFICINA PRO</h2></div>
+<nav class="sidebar-menu">
+<a href="dashboard.html">📊 Dashboard</a>
+<a href="clientes.html">👥 Clientes</a>
+<a href="veiculos.html">🚗 Veículos</a>
+<a href="ordens.html">🔧 Ordens de Serviço</a>
+<a href="estoque.html" class="active">📦 Estoque</a>
+<a href="financeiro.html">💰 Financeiro</a>
+<a href="agenda.html">📅 Agenda</a>
+<a href="usuarios.html">⚙️ Usuários</a>
+<a href="#" onclick="sair();return false" class="logout">🚪 Sair</a>
+</nav>
+</aside>
+
+<main class="main">
+<div class="topbar">
+<div>
+<h1>Estoque</h1>
+<p>Controle de peças e produtos da oficina</p>
+</div>
+<div class="user-info">👤 Administrador</div>
+</div>
+
+<div class="stock-cards">
+<div class="stock-card"><span>📦 Produtos cadastrados</span><strong id="cardProdutos">0</strong></div>
+<div class="stock-card"><span>🟢 Estoque normal</span><strong id="cardNormal">0</strong></div>
+<div class="stock-card"><span>🟡 Estoque baixo</span><strong id="cardBaixo">0</strong></div>
+<div class="stock-card danger"><span>🔴 Estoque crítico</span><strong id="cardCritico">0</strong></div>
+</div>
+
+<div class="content-box">
+<div class="content-header"><h2 id="tituloForm">Cadastrar produto</h2></div>
+
+<form id="formProduto" class="form-grid">
+<div class="form-group">
+<label for="codigo">Código *</label>
+<input id="codigo" required placeholder="Ex.: FIL-001">
+</div>
+<div class="form-group">
+<label for="nome">Produto / Peça *</label>
+<input id="nome" required placeholder="Ex.: Filtro de óleo">
+</div>
+<div class="form-group">
+<label for="categoria">Categoria</label>
+<select id="categoria">
+<option value="">Selecione</option>
+<option>Filtros</option><option>Óleos e lubrificantes</option><option>Freios</option>
+<option>Suspensão</option><option>Motor</option><option>Elétrica</option>
+<option>Pneus</option><option>Outros</option>
+</select>
+</div>
+<div class="form-group">
+<label for="fornecedor">Fornecedor</label>
+<input id="fornecedor" placeholder="Nome do fornecedor">
+</div>
+<div class="form-group">
+<label for="estoqueAtual">Estoque atual *</label>
+<input id="estoqueAtual" type="number" min="0" step="1" value="0" required>
+</div>
+<div class="form-group">
+<label for="estoqueMinimo">Estoque mínimo *</label>
+<input id="estoqueMinimo" type="number" min="0" step="1" value="1" required>
+</div>
+<div class="form-group">
+<label for="precoCusto">Preço de custo</label>
+<input id="precoCusto" type="number" min="0" step="0.01" value="0">
+</div>
+<div class="form-group">
+<label for="precoVenda">Preço de venda</label>
+<input id="precoVenda" type="number" min="0" step="0.01" value="0">
+</div>
+<button class="btn btn-blue" type="submit" id="btnSalvar">+ Cadastrar produto</button>
+</form>
+</div>
+
+<div class="content-box" id="historicoEstoqueBox"><div class="content-header"><div><h2>📜 Histórico de movimentações</h2><p class="table-subtitle">Entradas, saídas e consumos por OS</p></div><button class="btn btn-light" type="button" onclick="carregarHistoricoEstoque()">Atualizar</button></div><div class="table-container"><table><thead><tr><th>Data</th><th>Produto</th><th>Tipo</th><th>Qtd.</th><th>Saldo</th><th>Motivo</th><th>Usuário</th></tr></thead><tbody id="historicoEstoque"></tbody></table></div></div>
+
+<div class="content-box page-list">
+<div class="content-header">
+<div>
+<h2>Produtos em estoque</h2>
+<p class="table-subtitle" id="contador">0 produtos</p>
+</div>
+<input class="table-search" id="busca" placeholder="🔎 Buscar código, produto, categoria...">
+</div>
+
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>Código</th><th>Produto</th><th>Categoria</th><th>Estoque</th><th>Venda</th><th>Status</th><th>Ações</th>
+</tr>
+</thead>
+<tbody id="lista"></tbody>
+</table>
+</div>
+</div>
+</main>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script>
+const STORAGE="estoque";
+const form=document.getElementById("formProduto");
+const lista=document.getElementById("lista");
+const busca=document.getElementById("busca");
+let editandoId=null;
+
+function ler(){try{return JSON.parse(localStorage.getItem(STORAGE))||[]}catch{return[]}}
+function salvar(d){localStorage.setItem(STORAGE,JSON.stringify(d))}
+function moeda(v){return new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format(Number(v)||0)}
+function escapar(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+
+function situacao(p){
+    const atual=Number(p.estoqueAtual)||0, minimo=Number(p.estoqueMinimo)||0;
+    if(atual<=0) return ["Crítico","stock-critical"];
+    if(atual<=minimo) return ["Baixo","stock-low"];
+    return ["Normal","stock-ok"];
+}
+
+function atualizarCards(){
+    const d=ler();
+    document.getElementById("cardProdutos").textContent=d.length;
+    document.getElementById("cardNormal").textContent=d.filter(p=>situacao(p)[1]==="stock-ok").length;
+    document.getElementById("cardBaixo").textContent=d.filter(p=>situacao(p)[1]==="stock-low").length;
+    document.getElementById("cardCritico").textContent=d.filter(p=>situacao(p)[1]==="stock-critical").length;
+}
+
+function render(){
+    const todos=ler();
+    const termo=busca.value.toLowerCase().trim();
+    const filtrados=todos.filter(p=>[p.codigo,p.nome,p.categoria,p.fornecedor].join(" ").toLowerCase().includes(termo));
+    document.getElementById("contador").textContent=`${todos.length} ${todos.length===1?"produto":"produtos"}`;
+    lista.innerHTML="";
+    if(!filtrados.length){
+        lista.innerHTML='<tr><td colspan="7" class="empty-state">Nenhum produto encontrado.</td></tr>';
+        atualizarCards(); return;
+    }
+    filtrados.forEach(p=>{
+        const [texto,classe]=situacao(p);
+        const tr=document.createElement("tr");
+        tr.innerHTML=`
+        <td><strong>${escapar(p.codigo)}</strong></td>
+        <td>${escapar(p.nome)}</td>
+        <td>${escapar(p.categoria||"—")}</td>
+        <td><strong>${Number(p.estoqueAtual)||0}</strong> un.</td>
+        <td>${moeda(p.precoVenda)}</td>
+        <td><span class="stock-status ${classe}">${texto}</span></td>
+        <td class="actions">
+            <button class="btn-small btn-entry" onclick="movimentar(${p.id},'entrada')">+ Entrada</button>
+            <button class="btn-small btn-exit" onclick="movimentar(${p.id},'saida')">− Saída</button>
+            <button class="btn-small btn-edit" onclick="editar(${p.id})">Editar</button>
+            <button class="btn-danger" onclick="excluir(${p.id})">Excluir</button>
+        </td>`;
+        lista.appendChild(tr);
+    });
+    atualizarCards();
+}
+
+form.addEventListener("submit",e=>{
+    e.preventDefault();
+    const d=ler();
+    const item={
+        codigo:document.getElementById("codigo").value.trim().toUpperCase(),
+        nome:document.getElementById("nome").value.trim(),
+        categoria:document.getElementById("categoria").value,
+        fornecedor:document.getElementById("fornecedor").value.trim(),
+        estoqueAtual:Number(document.getElementById("estoqueAtual").value)||0,
+        estoqueMinimo:Number(document.getElementById("estoqueMinimo").value)||0,
+        precoCusto:Number(document.getElementById("precoCusto").value)||0,
+        precoVenda:Number(document.getElementById("precoVenda").value)||0
+    };
+    const duplicado=d.find(p=>p.codigo===item.codigo && p.id!==editandoId);
+    if(duplicado){alert("Já existe um produto com esse código.");return;}
+    if(editandoId!==null){
+        const i=d.findIndex(p=>p.id===editandoId);
+        if(i>=0)d[i]={...d[i],...item};
+    }else{
+        item.id=Date.now();
+        item.criadoEm=new Date().toISOString();
+        d.push(item);
+    }
+    salvar(d); limpar(); render();
+});
+
+function editar(id){
+    const p=ler().find(x=>x.id===id); if(!p)return;
+    editandoId=id;
+    ["codigo","nome","categoria","fornecedor","estoqueAtual","estoqueMinimo","precoCusto","precoVenda"].forEach(c=>document.getElementById(c).value=p[c]??"");
+    document.getElementById("tituloForm").textContent="Editar produto";
+    document.getElementById("btnSalvar").textContent="Salvar alterações";
+    window.scrollTo({top:0,behavior:"smooth"});
+}
+function limpar(){
+    form.reset();
+    document.getElementById("estoqueAtual").value=0;
+    document.getElementById("estoqueMinimo").value=1;
+    document.getElementById("precoCusto").value=0;
+    document.getElementById("precoVenda").value=0;
+    editandoId=null;
+    document.getElementById("tituloForm").textContent="Cadastrar produto";
+    document.getElementById("btnSalvar").textContent="+ Cadastrar produto";
+}
+function excluir(id){
+    const d=ler(),p=d.find(x=>x.id===id);if(!p)return;
+    if(!confirm(`Excluir "${p.nome}" do estoque?`))return;
+    salvar(d.filter(x=>x.id!==id));render();
+}
+async function movimentar(id,tipo){
+    const d=ler(),p=d.find(x=>String(x.id)===String(id));if(!p)return;
+    const texto=tipo==="entrada"?"quantidade de entrada":"quantidade de saída";
+    const q=prompt(`Informe a ${texto} para "${p.nome}":`);
+    if(q===null)return;
+    const qtd=Number(q);
+    if(!Number.isFinite(qtd)||qtd<=0){alert("Informe uma quantidade válida.");return;}
+    const motivo=prompt("Motivo da movimentação:",tipo==="entrada"?"Compra/entrada de mercadoria":"Saída/ajuste de estoque") || "Ajuste de estoque";
+    try{
+      if(window.oficinaAPI && localStorage.getItem("apiToken")){
+        const r=await oficinaAPI.stockMove(p.id,tipo,qtd,motivo);
+        oficinaAPI.setLocal("estoque",ler().map(x=>String(x.id)===String(r.produto.id)?r.produto:x));
+      }else{
+        if(tipo==="saida" && qtd>Number(p.estoqueAtual)){alert("Estoque insuficiente para essa saída.");return;}
+        p.estoqueAtual=Number(p.estoqueAtual)+(tipo==="entrada"?qtd:-qtd); salvar(d);
+      }
+      render(); carregarHistoricoEstoque();
+    }catch(e){alert(e.message||"Não foi possível movimentar o estoque.");}
+}
+async function carregarHistoricoEstoque(){
+  const el=document.getElementById("historicoEstoque"); if(!el)return;
+  if(!(window.oficinaAPI&&localStorage.getItem("apiToken"))){el.innerHTML='<tr><td colspan="7">Entre no modo online para consultar o histórico centralizado.</td></tr>';return;}
+  try{const rows=await oficinaAPI.stockMovements(200); el.innerHTML=rows.map(r=>`<tr><td>${new Date(r.at).toLocaleString('pt-BR')}</td><td><strong>${escapar(r.product_name)}</strong></td><td>${r.type==='entrada'?'Entrada':'Saída'}</td><td>${Number(r.quantity)||0}</td><td>${Number(r.after_qty)||0}</td><td>${escapar(r.reason||'—')}</td><td>${escapar(r.username||'—')}</td></tr>`).join('')||'<tr><td colspan="7">Nenhuma movimentação.</td></tr>';}catch(e){el.innerHTML=`<tr><td colspan="7">${escapar(e.message)}</td></tr>`;}
+}
+busca.addEventListener("input",render);
+render();
+carregarHistoricoEstoque();
+</script>
+</body>
+</html>

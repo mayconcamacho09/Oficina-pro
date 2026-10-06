@@ -1,0 +1,63 @@
+OFICINA PRO v9 — VERSÃO OPERACIONAL
+
+O que foi consolidado nesta versão:
+
+1. BANCO CENTRALIZADO
+- SQLite no servidor (backend/oficina.sqlite).
+- Dados deixam de depender exclusivamente do navegador.
+- Sincronização inicial e cache local para manter a interface rápida.
+
+2. LOGIN E SEGURANÇA
+- JWT com expiração de 8 horas.
+- Senhas armazenadas com bcrypt no banco.
+- Helmet, CORS e limite de tentativas de login.
+- Perfil do usuário preservado na sessão.
+
+3. ORDEM DE SERVIÇO + ESTOQUE TRANSACTIONAL
+- Peças cadastradas aparecem automaticamente na OS.
+- Código, nome, preço e saldo são exibidos.
+- Quando a OS entra em Aprovado, Em execução, Aguardando peça, Finalizado ou Entregue, o servidor calcula a diferença de estoque.
+- Alterar uma OS ajusta somente a diferença.
+- Voltar a OS para orçamento/aguardando aprovação devolve a quantidade consumida.
+- Excluir OS devolve as peças consumidas.
+- Estoque insuficiente bloqueia a operação.
+- OS e estoque são gravados em uma única transação SQLite quando o usuário está conectado ao servidor.
+
+4. AUDITORIA
+- Operações de login, salvamento, alteração de coleções e OS ficam registradas.
+- Tela de backup continua exibindo a auditoria local e a API fornece os últimos eventos do servidor.
+
+5. BACKUP
+- Endpoint /api/backup exporta os dados centralizados + auditoria.
+- A tela de backup continua permitindo exportação local e restauração.
+
+COMO EXECUTAR
+
+Requisitos:
+- Node.js 20+
+
+Passos:
+1. Abra um terminal na pasta do projeto.
+2. Copie .env.example para .env.
+3. Defina uma senha forte em ADMIN_PASSWORD.
+4. Defina um JWT_SECRET aleatório com pelo menos 32 caracteres.
+5. Execute: npm install
+6. Execute: npm start
+7. Abra: http://localhost:3000
+
+PRIMEIRO LOGIN
+- Usuário: o valor de ADMIN_USER no .env (padrão: admin)
+- Senha: o valor de ADMIN_PASSWORD no .env
+
+IMPORTANTE
+- O banco SQLite é criado automaticamente em backend/oficina.sqlite.
+- Para produção em servidor/VPS, use HTTPS e faça backup periódico do arquivo SQLite.
+- Para vários usuários simultâneos, mantenha todos apontando para o mesmo servidor.
+- O cache local é apenas uma cópia de trabalho; a fonte central é o SQLite.
+
+PRÓXIMA ETAPA RECOMENDADA
+- Fechamento de caixa diário.
+- Histórico formal de movimentações de estoque (entrada/saída/ajuste) com motivo.
+- Controle de contas a pagar e receber por vencimento.
+- Permissões por módulo.
+- Impressão/PDF e aprovação digital da OS.

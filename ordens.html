@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ordens de Serviço - Oficina Pro</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+<div class="sidebar-logo"><h2>🔧 OFICINA PRO</h2></div>
+<nav class="sidebar-menu">
+<a href="dashboard.html">📊 Dashboard</a>
+<a href="clientes.html">👥 Clientes</a>
+<a href="veiculos.html">🚗 Veículos</a>
+<a href="ordens.html" class="active">🔧 Ordens de Serviço</a>
+<a href="estoque.html">📦 Estoque</a>
+<a href="financeiro.html">💰 Financeiro</a>
+<a href="agenda.html">📅 Agenda</a>
+<a href="usuarios.html">⚙️ Usuários</a>
+<a href="#" onclick="sair();return false" class="logout">🚪 Sair</a>
+</nav>
+</aside>
+
+<main class="main">
+<div class="topbar">
+<div>
+<h1>Ordens de Serviço</h1>
+<p>Controle completo dos serviços realizados na oficina</p>
+</div>
+<div class="user-info">👤 Administrador</div>
+</div>
+
+<div class="content-box">
+<div class="content-header">
+<div>
+<h2 id="tituloFormulario">Nova Ordem de Serviço</h2>
+<p class="table-subtitle">Preencha os dados do atendimento</p>
+</div>
+<span class="os-number" id="numeroOS">OS #000001</span>
+</div>
+
+<form id="formOS">
+<div class="form-section">
+<h3>🚗 Dados do atendimento</h3>
+<div class="form-grid">
+<div class="form-group">
+<label for="clienteId">Cliente *</label>
+<select id="clienteId" required></select>
+</div>
+<div class="form-group">
+<label for="veiculoId">Veículo *</label>
+<select id="veiculoId" required></select>
+</div>
+<div class="form-group">
+<label for="dataEntrada">Data de entrada *</label>
+<input id="dataEntrada" type="date" required>
+</div>
+<div class="form-group">
+<label for="previsaoEntrega">Previsão de entrega</label>
+<input id="previsaoEntrega" type="date">
+</div>
+<div class="form-group">
+<label for="quilometragem">Quilometragem</label>
+<input id="quilometragem" type="number" min="0" placeholder="Ex.: 85000">
+</div>
+<div class="form-group">
+<label for="status">Status *</label>
+<select id="status" required>
+<option value="Orçamento">Orçamento</option>
+<option value="Aguardando aprovação">Aguardando aprovação</option>
+<option value="Aprovado">Aprovado</option>
+<option value="Em execução">Em execução</option>
+<option value="Aguardando peça">Aguardando peça</option>
+<option value="Finalizado">Finalizado</option>
+<option value="Entregue">Entregue</option>
+</select>
+</div>
+</div>
+</div>
+
+<div class="form-section">
+<h3>📝 Diagnóstico</h3>
+<div class="form-group full">
+<label for="problema">Problema relatado pelo cliente *</label>
+<textarea id="problema" rows="3" required placeholder="Descreva o problema informado pelo cliente..."></textarea>
+</div>
+<div class="form-group full">
+<label for="diagnostico">Diagnóstico técnico</label>
+<textarea id="diagnostico" rows="3" placeholder="Descreva o diagnóstico realizado..."></textarea>
+</div>
+</div>
+
+<div class="form-section">
+<div class="section-title-row">
+<h3>🔧 Serviços</h3>
+<button type="button" class="btn btn-light" onclick="adicionarServico()">+ Adicionar serviço</button>
+</div>
+<div id="servicos"></div>
+</div>
+
+<div class="form-section">
+<div class="section-title-row">
+<h3>📦 Peças</h3>
+<button type="button" class="btn btn-light" onclick="adicionarPeca()">+ Adicionar peça</button>
+</div>
+<div id="pecas"></div>
+</div>
+
+<div class="form-section">
+<h3>💰 Resumo financeiro</h3>
+<div class="totais-grid">
+<div><span>Serviços</span><strong id="totalServicos">R$ 0,00</strong></div>
+<div><span>Peças</span><strong id="totalPecas">R$ 0,00</strong></div>
+<div><span>Desconto</span><input id="desconto" type="number" min="0" step="0.01" value="0" placeholder="0,00"></div>
+<div class="total-final"><span>Total da OS</span><strong id="totalFinal">R$ 0,00</strong></div>
+</div>
+</div>
+
+<div class="form-actions">
+<button type="button" class="btn btn-secondary" onclick="limparFormulario()">Cancelar</button>
+<button type="submit" class="btn btn-blue" id="btnSalvar">Cadastrar Ordem de Serviço</button>
+</div>
+</form>
+</div>
+
+<div class="content-box page-list">
+<div class="content-header">
+<div>
+<h2>Ordens cadastradas</h2>
+<p class="table-subtitle" id="contador">0 ordens</p>
+</div>
+<input class="table-search" id="busca" placeholder="🔎 Buscar por OS, cliente, veículo ou status...">
+</div>
+<div class="table-container">
+<table>
+<thead>
+<tr><th>OS</th><th>Cliente</th><th>Veículo</th><th>Entrada</th><th>Status</th><th>Total</th><th>Ações</th></tr>
+</thead>
+<tbody id="lista"></tbody>
+</table>
+</div>
+</div>
+</main>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script>
+const STORAGE = "ordens";
+const form = document.getElementById("formOS");
+const lista = document.getElementById("lista");
+const busca = document.getElementById("busca");
+const clienteSelect = document.getElementById("clienteId");
+const veiculoSelect = document.getElementById("veiculoId");
+let editandoId = null;
+
+function ler(chave) {
+    try {
+        const d = JSON.parse(localStorage.getItem(chave));
+        return Array.isArray(d) ? d : [];
+    } catch { return []; }
+}
+function salvar(d) { localStorage.setItem(STORAGE, JSON.stringify(d)); }
+
+function escapar(v) {
+    return String(v ?? "").replace(/[&<>"']/g, c => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+    }[c]));
+}
+function moeda(v) {
+    return new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format(Number(v)||0);
+}
+function dataBR(v) {
+    if (!v) return "—";
+    const p = v.split("-");
+    return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : v;
+}
+
+function proximoNumero() {
+    const ordens = ler(STORAGE);
+    const maior = ordens.reduce((m,o) => Math.max(m, Number(o.numero)||0), 0);
+    return maior + 1;
+}
+function atualizarNumero() {
+    const numero = editandoId ? (ler(STORAGE).find(o => o.id === editandoId)?.numero || 1) : proximoNumero();
+    document.getElementById("numeroOS").textContent = `OS #${String(numero).padStart(6,"0")}`;
+}
+
+function carregarClientes(clienteAtual="") {
+    const clientes = ler("clientes").sort((a,b)=>String(a.nome).localeCompare(String(b.nome)));
+    clienteSelect.innerHTML = '<option value="">Selecione um cliente</option>';
+    clientes.forEach(c => {
+        const op=document.createElement("option");
+        op.value=c.id; op.textContent=c.nome;
+        if(String(c.id)===String(clienteAtual)) op.selected=true;
+        clienteSelect.appendChild(op);
+    });
+    atualizarVeiculos(clienteAtual, "");
+}
+
+function atualizarVeiculos(clienteId, veiculoAtual="") {
+    const veiculos = ler("veiculos").filter(v => String(v.clienteId) === String(clienteId));
+    veiculoSelect.innerHTML = '<option value="">Selecione o veículo</option>';
+    veiculos.forEach(v => {
+        const op=document.createElement("option");
+        op.value=v.id;
+        op.textContent=`${v.marca} ${v.modelo} — ${v.placa}`;
+        if(String(v.id)===String(veiculoAtual)) op.selected=true;
+        veiculoSelect.appendChild(op);
+    });
+    veiculoSelect.disabled = !clienteId;
+}
+
+clienteSelect.addEventListener("change", () => atualizarVeiculos(clienteSelect.value));
+
+function produtosEstoque() {
+    return ler("estoque").sort((a,b)=>String(a.nome||"").localeCompare(String(b.nome||"")));
+}
+
+function adicionarLinha(tipo, dados={}) {
+    const container=document.getElementById(tipo==="servico" ? "servicos" : "pecas");
+    const linha=document.createElement("div");
+    linha.className="item-row";
+    linha.dataset.tipo=tipo;
+
+    if(tipo === "peca") {
+        const produtos=produtosEstoque();
+        const opcoes=['<option value="">Selecione uma peça cadastrada</option>', ...produtos.map(p=>`<option value="${escapar(p.id)}">${escapar(p.codigo||"")} — ${escapar(p.nome)} | Estoque: ${Number(p.estoqueAtual)||0} | ${moeda(p.precoVenda)}</option>`), '<option value="__manual__">✎ Digitar peça manualmente</option>'].join("");
+        linha.innerHTML=`
+            <div class="item-description">
+                <label>Peça / produto cadastrado</label>
+                <select class="item-produto">${opcoes}</select>
+                <input class="item-nome" required placeholder="Ex.: Filtro de óleo" value="${escapar(dados.nome||"")}">
+                <small class="estoque-disponivel"></small>
+            </div>
+            <div>
+                <label>Qtd.</label>
+                <input class="item-qtd" type="number" min="0.01" step="0.01" value="${dados.quantidade||1}">
+            </div>
+            <div>
+                <label>Valor unitário</label>
+                <input class="item-valor" type="number" min="0" step="0.01" value="${dados.valor||0}">
+            </div>
+            <div>
+                <label>Total</label>
+                <strong class="item-total">${moeda((Number(dados.quantidade)||1)*(Number(dados.valor)||0))}</strong>
+            </div>
+            <button type="button" class="btn-remove" title="Remover">×</button>
+        `;
+        const select=linha.querySelector(".item-produto");
+        const nome=linha.querySelector(".item-nome");
+        const valor=linha.querySelector(".item-valor");
+        const info=linha.querySelector(".estoque-disponivel");
+        if(dados.produtoId) select.value=String(dados.produtoId);
+        else if(dados.manual) select.value="__manual__";
+
+        function sincronizarProduto(){
+            const id=select.value;
+            if(id && id!=="__manual__") {
+                const produto=produtosEstoque().find(p=>String(p.id)===String(id));
+                if(produto){
+                    nome.value=produto.nome||"";
+                    valor.value=Number(produto.precoVenda)||0;
+                    info.textContent=`Disponível: ${Number(produto.estoqueAtual)||0} unidade(s) • Código: ${produto.codigo||"—"}`;
+                    nome.readOnly=true;
+                    valor.readOnly=false;
+                }
+            } else {
+                info.textContent="Peça manual: não será vinculada ao estoque.";
+                nome.readOnly=false;
+            }
+            calcularTotais();
+        }
+        select.addEventListener("change",sincronizarProduto);
+        linha.querySelectorAll("input").forEach(i=>i.addEventListener("input", calcularTotais));
+        sincronizarProduto();
+    } else {
+        linha.innerHTML=`
+            <div class="item-description">
+                <label>Descrição do serviço</label>
+                <input class="item-nome" required placeholder="Ex.: Troca de óleo" value="${escapar(dados.nome||"")}">
+            </div>
+            <div>
+                <label>Qtd.</label>
+                <input class="item-qtd" type="number" min="0.01" step="0.01" value="${dados.quantidade||1}">
+            </div>
+            <div>
+                <label>Valor unitário</label>
+                <input class="item-valor" type="number" min="0" step="0.01" value="${dados.valor||0}">
+            </div>
+            <div>
+                <label>Total</label>
+                <strong class="item-total">${moeda((Number(dados.quantidade)||1)*(Number(dados.valor)||0))}</strong>
+            </div>
+            <button type="button" class="btn-remove" title="Remover">×</button>
+        `;
+        linha.querySelectorAll("input").forEach(i=>i.addEventListener("input", calcularTotais));
+    }
+    linha.querySelector(".btn-remove").addEventListener("click",()=>{linha.remove();calcularTotais();});
+    container.appendChild(linha);
+}
+function adicionarServico(dados={}) { adicionarLinha("servico",dados); }
+function adicionarPeca(dados={}) { adicionarLinha("peca",dados); }
+
+function calcularTotais() {
+    let ts=0,tp=0;
+    document.querySelectorAll("#servicos .item-row").forEach(r=>{
+        const total=(Number(r.querySelector(".item-qtd").value)||0)*(Number(r.querySelector(".item-valor").value)||0);
+        r.querySelector(".item-total").textContent=moeda(total); ts+=total;
+    });
+    document.querySelectorAll("#pecas .item-row").forEach(r=>{
+        const total=(Number(r.querySelector(".item-qtd").value)||0)*(Number(r.querySelector(".item-valor").value)||0);
+        r.querySelector(".item-total").textContent=moeda(total); tp+=total;
+    });
+    const desconto=Math.max(0,Number(document.getElementById("desconto").value)||0);
+    document.getElementById("totalServicos").textContent=moeda(ts);
+    document.getElementById("totalPecas").textContent=moeda(tp);
+    document.getElementById("totalFinal").textContent=moeda(Math.max(0,ts+tp-desconto));
+}
+document.getElementById("desconto").addEventListener("input",calcularTotais);
+
+function coletarLinhas(id) {
+    return [...document.querySelectorAll(`#${id} .item-row`)].map(r=>{
+        const produtoSelect=r.querySelector(".item-produto");
+        const produtoId=produtoSelect && produtoSelect.value && produtoSelect.value!=="__manual__" ? produtoSelect.value : null;
+        const produto=produtoId ? produtosEstoque().find(p=>String(p.id)===String(produtoId)) : null;
+        const quantidade=Number(r.querySelector(".item-qtd").value)||0;
+        const valor=Number(r.querySelector(".item-valor").value)||0;
+        return {
+            produtoId:produtoId ? (produto?.id ?? produtoId) : null,
+            codigo:produto?.codigo || "",
+            nome:r.querySelector(".item-nome").value.trim(),
+            quantidade, valor,
+            total:quantidade*valor,
+            manual:!produtoId
+        };
+    }).filter(x=>x.nome);
+}
+
+function statusBaixaEstoque(status){
+    return ["Aprovado","Em execução","Aguardando peça","Finalizado","Entregue"].includes(status);
+}
+
+function quantidadesPorProduto(pecas){
+    const mapa={};
+    (pecas||[]).forEach(p=>{ if(p.produtoId && !p.manual) mapa[String(p.produtoId)]=(mapa[String(p.produtoId)]||0)+Number(p.quantidade||0); });
+    return mapa;
+}
+
+function ajustarEstoqueDaOS(antes, depois){
+    const estoque=ler("estoque");
+    const antigo=antes && statusBaixaEstoque(antes.status) ? quantidadesPorProduto(antes.pecas) : {};
+    const novo=statusBaixaEstoque(depois.status) ? quantidadesPorProduto(depois.pecas) : {};
+    const ids=new Set([...Object.keys(antigo),...Object.keys(novo)]);
+
+    for(const id of ids){
+        const delta=(novo[id]||0)-(antigo[id]||0);
+        if(!delta) continue;
+        const produto=estoque.find(p=>String(p.id)===String(id));
+        if(!produto) throw new Error(`A peça vinculada ao produto ${id} não foi encontrada no estoque.`);
+        if(delta>0 && delta>Number(produto.estoqueAtual||0)){
+            throw new Error(`Estoque insuficiente para "${produto.nome}". Disponível: ${Number(produto.estoqueAtual)||0}; necessário: ${delta}.`);
+        }
+        produto.estoqueAtual=Number(produto.estoqueAtual||0)-delta;
+    }
+    localStorage.setItem("estoque",JSON.stringify(estoque));
+}
+
+form.addEventListener("submit",async e=>{
+    e.preventDefault();
+    const btn=document.getElementById("btnSalvar");
+    if(btn.disabled) return;
+    btn.disabled=true;
+    if (!ler("clientes").length) { alert("Cadastre um cliente antes de criar uma Ordem de Serviço."); return; }
+    if (!veiculoSelect.value) { alert("Selecione o veículo do atendimento."); return; }
+
+    const ordens=ler(STORAGE);
+    const servicos=coletarLinhas("servicos");
+    const pecas=coletarLinhas("pecas");
+    const totalServicos=servicos.reduce((s,x)=>s+x.total,0);
+    const totalPecas=pecas.reduce((s,x)=>s+x.total,0);
+    const desconto=Math.max(0,Number(document.getElementById("desconto").value)||0);
+    const total=Math.max(0,totalServicos+totalPecas-desconto);
+
+    const cliente=ler("clientes").find(c=>String(c.id)===String(clienteSelect.value));
+    const veiculo=ler("veiculos").find(v=>String(v.id)===String(veiculoSelect.value));
+
+    const dados={
+        clienteId:cliente.id,
+        cliente:cliente.nome,
+        veiculoId:veiculo.id,
+        veiculo:`${veiculo.marca} ${veiculo.modelo} - ${veiculo.placa}`,
+        dataEntrada:document.getElementById("dataEntrada").value,
+        previsaoEntrega:document.getElementById("previsaoEntrega").value,
+        quilometragem:document.getElementById("quilometragem").value,
+        status:document.getElementById("status").value,
+        problema:document.getElementById("problema").value.trim(),
+        diagnostico:document.getElementById("diagnostico").value.trim(),
+        servicos, pecas, desconto, totalServicos, totalPecas, total
+    };
+
+    try {
+        const antes = editandoId!==null ? ordens.find(o=>String(o.id)===String(editandoId)) : null;
+        if(editandoId!==null && antes){
+            dados.id=antes.id;
+            dados.numero=antes.numero;
+            dados.criadoEm=antes.criadoEm;
+        } else {
+            dados.id=Date.now();
+            dados.numero=proximoNumero();
+            dados.criadoEm=new Date().toISOString();
+        }
+
+        // No modo online, o servidor faz OS + baixa/devolução de estoque em uma única transação.
+        if(window.oficinaAPI && localStorage.getItem("apiToken")){
+            const resposta=await window.oficinaAPI.saveOS(dados, antes?.id ?? null);
+            window.oficinaAPI.setLocal("ordens", ler("ordens").filter(o=>String(o.id)!==String(dados.id)).concat([resposta.ordem]));
+            window.oficinaAPI.setLocal("estoque", resposta.estoque || ler("estoque"));
+        } else {
+            if(antes) {
+                ajustarEstoqueDaOS(antes,dados);
+                const i=ordens.findIndex(o=>String(o.id)===String(editandoId));
+                if(i>=0) ordens[i]={...ordens[i],...dados};
+            } else {
+                ajustarEstoqueDaOS(null,dados);
+                ordens.push(dados);
+            }
+            salvar(ordens);
+        }
+        limparFormulario();
+        render();
+    } catch(err) {
+        alert(err.message || "Não foi possível salvar a OS e atualizar o estoque.");
+    } finally {
+        btn.disabled=false;
+    }
+});
+
+function editar(id) {
+    const o=ler(STORAGE).find(x=>x.id===id);
+    if(!o) return;
+    editandoId=id;
+    document.getElementById("tituloFormulario").textContent="Editar Ordem de Serviço";
+    document.getElementById("btnSalvar").textContent="Salvar alterações";
+    carregarClientes(o.clienteId);
+    setTimeout(()=>{ veiculoSelect.value=o.veiculoId||""; },0);
+    ["dataEntrada","previsaoEntrega","quilometragem","status","problema","diagnostico","desconto"].forEach(c=>{
+        document.getElementById(c).value=o[c]??"";
+    });
+    document.getElementById("servicos").innerHTML="";
+    document.getElementById("pecas").innerHTML="";
+    (o.servicos||[]).forEach(adicionarServico);
+    (o.pecas||[]).forEach(adicionarPeca);
+    if(!o.servicos?.length) adicionarServico();
+    atualizarNumero();
+    calcularTotais();
+    window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function limparFormulario() {
+    form.reset();
+    document.getElementById("servicos").innerHTML="";
+    document.getElementById("pecas").innerHTML="";
+    editandoId=null;
+    document.getElementById("tituloFormulario").textContent="Nova Ordem de Serviço";
+    document.getElementById("btnSalvar").textContent="Cadastrar Ordem de Serviço";
+    document.getElementById("dataEntrada").value=new Date().toISOString().slice(0,10);
+    document.getElementById("status").value="Orçamento";
+    carregarClientes();
+    adicionarServico();
+    atualizarNumero();
+    calcularTotais();
+}
+
+function render() {
+    const todos=ler(STORAGE);
+    const termo=busca.value.toLowerCase().trim();
+    const filtrados=todos.filter(o=>
+        [o.numero,o.id,o.cliente,o.veiculo,o.status].join(" ").toLowerCase().includes(termo)
+    );
+    document.getElementById("contador").textContent=`${todos.length} ${todos.length===1?"ordem":"ordens"}`;
+    lista.innerHTML="";
+    if(!filtrados.length){
+        lista.innerHTML='<tr><td colspan="7" class="empty-state">Nenhuma ordem encontrada.</td></tr>';
+        return;
+    }
+    filtrados.slice().reverse().forEach(o=>{
+        const tr=document.createElement("tr");
+        const statusClass={
+            "Orçamento":"status-gray","Aguardando aprovação":"status-yellow","Aprovado":"status-blue",
+            "Em execução":"status-blue","Aguardando peça":"status-orange","Finalizado":"status-green","Entregue":"status-green"
+        }[o.status]||"status-gray";
+        tr.innerHTML=`
+            <td><strong>#${String(o.numero||o.id).padStart(6,"0")}</strong></td>
+            <td>${escapar(o.cliente||"")}</td>
+            <td>${escapar(o.veiculo||"")}</td>
+            <td>${dataBR(o.dataEntrada)}</td>
+            <td><span class="status ${statusClass}">${escapar(o.status||"")}</span></td>
+            <td class="valor-monetario">${moeda(o.total)}</td>
+            <td class="actions">
+                <button class="btn-small btn-edit" onclick="editar(${o.id})">Editar</button>
+                <button class="btn-small btn-doc" onclick="gerarPDFOS(${o.id})">📄 PDF</button>
+                <button class="btn-small btn-receipt" onclick="gerarRecibo(${o.id})">🧾 Recibo</button>
+                <button class="btn-small btn-whatsapp" onclick="enviarWhatsApp(${o.id})">📱 WhatsApp</button>
+                <button class="btn-danger" onclick="excluir(${o.id})">Excluir</button>
+            </td>`;
+        lista.appendChild(tr);
+    });
+}
+
+async function excluir(id) {
+    const todos=ler(STORAGE);
+    const o=todos.find(x=>String(x.id)===String(id));
+    if(!o) return;
+    if(!confirm(`Excluir a OS #${String(o.numero||o.id).padStart(6,"0")}? As peças consumidas serão devolvidas ao estoque.`)) return;
+    try {
+        if(window.oficinaAPI && localStorage.getItem("apiToken")){
+            const resposta=await window.oficinaAPI.deleteOS(o);
+            window.oficinaAPI.setLocal("ordens",todos.filter(x=>String(x.id)!==String(id)));
+            window.oficinaAPI.setLocal("estoque",resposta.estoque || ler("estoque"));
+        } else {
+            ajustarEstoqueDaOS(o,{...o,status:"Orçamento",pecas:[]});
+            salvar(todos.filter(x=>String(x.id)!==String(id)));
+        }
+        render();
+        atualizarNumero();
+    } catch(err) {
+        alert(err.message || "Não foi possível excluir a OS/devolver as peças ao estoque.");
+    }
+}
+
+busca.addEventListener("input",render);
+window.addEventListener("storage",e=>{
+    if(e.key==="clientes"||e.key==="veiculos"||e.key==="ordens"){carregarClientes(clienteSelect.value);render();}
+});
+
+document.getElementById("dataEntrada").value=new Date().toISOString().slice(0,10);
+carregarClientes();
+adicionarServico();
+atualizarNumero();
+calcularTotais();
+render();
+</script>
+
+<script>
+function obterClienteOS(o) {
+    return ler("clientes").find(c => String(c.id) === String(o.clienteId)) || {};
+}
+
+function obterVeiculoOS(o) {
+    return ler("veiculos").find(v => String(v.id) === String(o.veiculoId)) || {};
+}
+
+function escaparPrint(v) {
+    return String(v ?? "").replace(/[&<>"']/g, c => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+    }[c]));
+}
+
+function abrirDocumento(titulo, conteudo) {
+    const janela = window.open("", "_blank", "width=900,height=800");
+    if (!janela) {
+        alert("O navegador bloqueou a janela. Permita pop-ups para gerar o documento.");
+        return;
+    }
+
+    janela.document.write(`<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>${escaparPrint(titulo)}</title>
+<style>
+*{box-sizing:border-box}
+body{font-family:Arial,Helvetica,sans-serif;margin:0;padding:35px;color:#222;background:#fff}
+.document{max-width:850px;margin:auto}
+.header{display:flex;justify-content:space-between;gap:20px;border-bottom:3px solid #111827;padding-bottom:18px;margin-bottom:25px}
+.logo{font-size:25px;font-weight:800}.subtitle{color:#6b7280;margin-top:5px}
+.os-title{text-align:right}.os-title strong{font-size:24px;display:block}
+h2{font-size:17px;border-bottom:1px solid #ddd;padding-bottom:8px;margin-top:25px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.box{border:1px solid #ddd;border-radius:7px;padding:12px}
+.label{font-size:11px;color:#6b7280;text-transform:uppercase;margin-bottom:4px}
+.value{font-weight:600}
+table{width:100%;border-collapse:collapse;margin-top:10px}
+th,td{padding:9px;border-bottom:1px solid #ddd;text-align:left;font-size:13px}
+th{background:#f3f4f6}
+.right{text-align:right}
+.total{margin-left:auto;width:300px;margin-top:15px}
+.total div{display:flex;justify-content:space-between;padding:6px}
+.total .final{font-size:20px;font-weight:800;border-top:2px solid #111827;margin-top:5px;padding-top:10px}
+.note{white-space:pre-wrap;line-height:1.5}
+.footer{margin-top:40px;border-top:1px solid #ddd;padding-top:15px;color:#6b7280;font-size:11px;text-align:center}
+.signature{display:grid;grid-template-columns:1fr 1fr;gap:50px;margin-top:70px}
+.signature div{border-top:1px solid #222;text-align:center;padding-top:7px}
+@media print{body{padding:10mm}.no-print{display:none!important}}
+</style>
+</head>
+<body>
+<div class="document">${conteudo}</div>
+<script>window.onload=function(){setTimeout(function(){window.print()},350)};<\/script>
+</body>
+</html>`);
+    janela.document.close();
+}
+
+function htmlCabecalhoDocumento(o, tipo) {
+    return `
+    <div class="header">
+        <div>
+            <div class="logo">🔧 OFICINA PRO</div>
+            <div class="subtitle">Manutenção automotiva</div>
+        </div>
+        <div class="os-title">
+            <strong>${tipo}</strong>
+            <span>OS #${String(o.numero || o.id).padStart(6,"0")}</span>
+        </div>
+    </div>`;
+}
+
+function gerarPDFOS(id) {
+    const o = ler(STORAGE).find(x => x.id === id);
+    if (!o) return;
+
+    const c = obterClienteOS(o);
+    const v = obterVeiculoOS(o);
+    const servicos = o.servicos || [];
+    const pecas = o.pecas || [];
+
+    const linhasServicos = servicos.length
+        ? servicos.map(s => `<tr><td>${escaparPrint(s.nome)}</td><td>${s.quantidade}</td><td class="right">${moeda(s.valor)}</td><td class="right">${moeda(s.total)}</td></tr>`).join("")
+        : `<tr><td colspan="4">Nenhum serviço informado.</td></tr>`;
+
+    const linhasPecas = pecas.length
+        ? pecas.map(p => `<tr><td>${escaparPrint(p.nome)}</td><td>${p.quantidade}</td><td class="right">${moeda(p.valor)}</td><td class="right">${moeda(p.total)}</td></tr>`).join("")
+        : `<tr><td colspan="4">Nenhuma peça informada.</td></tr>`;
+
+    const conteudo = `
+        ${htmlCabecalhoDocumento(o, "ORDEM DE SERVIÇO")}
+        <h2>Dados do atendimento</h2>
+        <div class="grid">
+            <div class="box"><div class="label">Cliente</div><div class="value">${escaparPrint(o.cliente)}</div></div>
+            <div class="box"><div class="label">Telefone</div><div class="value">${escaparPrint(c.telefone || c.celular || "Não informado")}</div></div>
+            <div class="box"><div class="label">Veículo</div><div class="value">${escaparPrint(o.veiculo)}</div></div>
+            <div class="box"><div class="label">Placa</div><div class="value">${escaparPrint(v.placa || "Não informado")}</div></div>
+            <div class="box"><div class="label">Entrada</div><div class="value">${dataBR(o.dataEntrada)}</div></div>
+            <div class="box"><div class="label">Previsão de entrega</div><div class="value">${dataBR(o.previsaoEntrega)}</div></div>
+            <div class="box"><div class="label">Quilometragem</div><div class="value">${escaparPrint(o.quilometragem || "Não informada")} km</div></div>
+            <div class="box"><div class="label">Status</div><div class="value">${escaparPrint(o.status)}</div></div>
+        </div>
+
+        <h2>Diagnóstico</h2>
+        <div class="box"><div class="label">Problema relatado</div><div class="note">${escaparPrint(o.problema || "Não informado")}</div></div>
+        <div class="box" style="margin-top:10px"><div class="label">Diagnóstico técnico</div><div class="note">${escaparPrint(o.diagnostico || "Não informado")}</div></div>
+
+        <h2>Serviços</h2>
+        <table><thead><tr><th>Descrição</th><th>Qtd.</th><th>Unitário</th><th class="right">Total</th></tr></thead><tbody>${linhasServicos}</tbody></table>
+
+        <h2>Peças</h2>
+        <table><thead><tr><th>Descrição</th><th>Qtd.</th><th>Unitário</th><th class="right">Total</th></tr></thead><tbody>${linhasPecas}</tbody></table>
+
+        <div class="total">
+            <div><span>Serviços</span><strong>${moeda(o.totalServicos)}</strong></div>
+            <div><span>Peças</span><strong>${moeda(o.totalPecas)}</strong></div>
+            <div><span>Desconto</span><strong>${moeda(o.desconto)}</strong></div>
+            <div class="final"><span>TOTAL</span><span>${moeda(o.total)}</span></div>
+        </div>
+
+        <div class="signature">
+            <div>Responsável pela oficina</div>
+            <div>Cliente</div>
+        </div>
+        <div class="footer">Documento gerado pelo Oficina Pro em ${new Date().toLocaleString("pt-BR")}</div>`;
+
+    abrirDocumento("OS " + String(o.numero || o.id).padStart(6,"0"), conteudo);
+}
+
+function gerarRecibo(id) {
+    const o = ler(STORAGE).find(x => x.id === id);
+    if (!o) return;
+
+    const pagamentos = lerFinanceiroRecibos().filter(p => String(p.osId) === String(id));
+    const recebido = pagamentos.reduce((s,p) => s + (Number(p.valor) || 0), 0);
+    const ultimo = pagamentos.slice().sort((a,b) => String(b.data).localeCompare(String(a.data)))[0];
+
+    if (!pagamentos.length) {
+        alert("Ainda não existe nenhum recebimento registrado para esta OS.");
+        return;
+    }
+
+    const cliente = obterClienteOS(o);
+    const valor = ultimo.valor;
+
+    const conteudo = `
+        ${htmlCabecalhoDocumento(o, "RECIBO")}
+        <div class="box" style="margin-top:30px">
+            <p>Recebemos de <strong>${escaparPrint(o.cliente)}</strong> a importância de:</p>
+            <p style="font-size:30px;font-weight:800;text-align:center">${moeda(valor)}</p>
+            <p>Referente à Ordem de Serviço <strong>#${String(o.numero || o.id).padStart(6,"0")}</strong>.</p>
+            <p><strong>Data:</strong> ${dataBR(ultimo.data)}</p>
+            <p><strong>Forma de pagamento:</strong> ${escaparPrint(ultimo.formaPagamento || "Não informada")}</p>
+            <p><strong>Cliente:</strong> ${escaparPrint(cliente.nome || o.cliente)}</p>
+            <p><strong>Total da OS:</strong> ${moeda(o.total)}</p>
+            <p><strong>Total recebido até agora:</strong> ${moeda(recebido)}</p>
+            <p><strong>Saldo em aberto:</strong> ${moeda(Math.max(0, (Number(o.total)||0)-recebido))}</p>
+        </div>
+        <div class="signature">
+            <div>Responsável pela oficina</div>
+            <div>Cliente</div>
+        </div>
+        <div class="footer">Recibo gerado pelo Oficina Pro em ${new Date().toLocaleString("pt-BR")}</div>`;
+
+    abrirDocumento("Recibo OS " + String(o.numero || o.id).padStart(6,"0"), conteudo);
+}
+
+function lerFinanceiroRecibos() {
+    try {
+        const d = JSON.parse(localStorage.getItem("pagamentos"));
+        return Array.isArray(d) ? d : [];
+    } catch { return []; }
+}
+
+function enviarWhatsApp(id) {
+    const o = ler(STORAGE).find(x => x.id === id);
+    if (!o) return;
+
+    const c = obterClienteOS(o);
+    const telefone = String(c.telefone || c.celular || c.whatsapp || "").replace(/\D/g, "");
+
+    const pagamentos = lerFinanceiroRecibos().filter(p => String(p.osId) === String(id));
+    const recebido = pagamentos.reduce((s,p) => s + (Number(p.valor)||0), 0);
+    const saldo = Math.max(0, (Number(o.total)||0) - recebido);
+
+    let saudacao = c.nome ? `Olá, ${c.nome}!` : "Olá!";
+    let mensagem =
+`${saudacao}
+
+Aqui é da Oficina Pro. 🔧
+
+Sua Ordem de Serviço #${String(o.numero || o.id).padStart(6,"0")} está com status: ${o.status}.
+
+🚗 Veículo: ${o.veiculo}
+💰 Valor total: ${moeda(o.total)}
+📥 Recebido: ${moeda(recebido)}
+🧾 Saldo em aberto: ${moeda(saldo)}
+
+Obrigado pela preferência!`;
+
+    const url = telefone
+        ? `https://wa.me/${telefone}?text=${encodeURIComponent(mensagem)}`
+        : `https://wa.me/?text=${encodeURIComponent(mensagem)}`;
+
+    window.open(url, "_blank");
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Oficina Pro</title><link rel="stylesheet" href="css/style.css"></head>
+<body class="login-body">
+<div class="login-container" id="app">
+  <div class="login-logo"><div class="logo-icon">🔧</div><h1>OFICINA PRO</h1><p>Gestão inteligente para sua oficina</p></div>
+  <div id="telaLogin">
+    <form id="loginForm"><div class="input-group"><label>Usuário</label><input type="text" id="usuario" autocomplete="username" required></div><div class="input-group"><label>Senha</label><input type="password" id="senha" autocomplete="current-password" required></div><button type="submit" class="btn-primary">Entrar</button><p id="loginMensagem"></p></form>
+  </div>
+  <div id="telaSetup" style="display:none;text-align:left">
+    <h2 style="margin-bottom:8px">⚙️ Configuração inicial</h2><p style="margin-bottom:18px;color:#64748b">Cadastre sua oficina e crie o primeiro usuário Administrador. Essa tela aparece somente uma vez.</p>
+    <form id="setupForm">
+      <h3>Dados da oficina</h3>
+      <div class="input-group"><label>Nome da oficina *</label><input id="companyName" required></div>
+      <div class="input-group"><label>CNPJ</label><input id="cnpj"></div>
+      <div class="input-group"><label>Telefone</label><input id="telefone"></div>
+      <div class="input-group"><label>Endereço</label><input id="endereco"></div>
+      <h3 style="margin-top:18px">Administrador</h3>
+      <div class="input-group"><label>Nome *</label><input id="adminName" required></div>
+      <div class="input-group"><label>Usuário *</label><input id="adminUsername" placeholder="ex.: michael" required></div>
+      <div class="input-group"><label>E-mail</label><input id="adminEmail" type="email"></div>
+      <div class="input-group"><label>Senha *</label><input id="adminPassword" type="password" minlength="8" required></div>
+      <div class="input-group"><label>Confirmar senha *</label><input id="adminPassword2" type="password" minlength="8" required></div>
+      <button type="submit" class="btn-primary">Criar administrador e iniciar</button><p id="setupMensagem"></p>
+    </form>
+  </div>
+</div>
+<script src="js/api.js"></script>
+<script>
+(async function(){
+  const login=document.getElementById('telaLogin'), setup=document.getElementById('telaSetup');
+  try{const r=await fetch('/api/setup/status'); const d=await r.json(); if(!d.configured){login.style.display='none';setup.style.display='block';}}
+  catch(e){document.getElementById('loginMensagem').textContent='Não foi possível conectar ao servidor.';}
+  document.getElementById('setupForm').addEventListener('submit',async e=>{e.preventDefault();const msg=document.getElementById('setupMensagem');if(adminPassword.value!==adminPassword2.value){msg.textContent='As senhas não conferem.';msg.style.color='#dc2626';return;}try{const r=await fetch('/api/setup/initialize',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({companyName:companyName.value,cnpj:cnpj.value,telefone:telefone.value,endereco:endereco.value,adminName:adminName.value,adminUsername:adminUsername.value,adminEmail:adminEmail.value,adminPassword:adminPassword.value})});const d=await r.json();if(!r.ok)throw Error(d.error||'Erro na configuração.');msg.textContent=d.message;msg.style.color='#16a34a';setTimeout(()=>location.reload(),700)}catch(err){msg.textContent=err.message;msg.style.color='#dc2626'}});
+})();
+</script><script src="js/login.js"></script>
+</body></html>

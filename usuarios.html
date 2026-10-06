@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuários - Oficina Pro</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<div class="layout">
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            🔧 Oficina Pro
+        </div>
+
+        <nav class="sidebar-menu">
+
+            <a href="dashboard.html">📊 Dashboard</a>
+            <a href="clientes.html">👥 Clientes</a>
+            <a href="veiculos.html">🚗 Veículos</a>
+            <a href="ordens.html">📋 Ordens de Serviço</a>
+            <a href="estoque.html">📦 Estoque</a>
+            <a href="financeiro.html">💰 Financeiro</a>
+            <a href="agenda.html">📅 Agenda</a>
+            <a href="usuarios.html" class="active">⚙️ Usuários</a>
+
+            <a href="#" onclick="sair()">🚪 Sair</a>
+
+        </nav>
+
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <h1>Usuários</h1>
+                <p>Gerencie os usuários do sistema</p>
+            </div>
+
+            <div class="user-info">
+                👤 Administrador
+            </div>
+        </header>
+
+        <section class="content">
+
+            <div class="card">
+
+                <h2>Cadastrar novo usuário</h2>
+
+                <form id="formUsuario">
+
+                    <div class="form-grid">
+
+                        <div class="form-group">
+                            <label>Nome</label>
+                            <input
+                                type="text"
+                                id="nome"
+                                placeholder="Nome completo"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label>Usuário</label>
+                            <input
+                                type="text"
+                                id="usuario"
+                                placeholder="Nome de usuário"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label>Senha</label>
+                            <input
+                                type="password"
+                                id="senha"
+                                placeholder="Senha"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label>Perfil</label>
+
+                            <select id="perfil" required>
+                                <option value="Funcionário">Funcionário</option>
+                                <option value="Atendente">Atendente</option>
+                                <option value="Mecânico">Mecânico</option>
+                                <option value="Estoquista">Estoquista</option>
+                                <option value="Gerente">Gerente</option>
+                                <option value="Administrador">Administrador</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <button type="submit" class="btn-primary">
+                        + Cadastrar usuário
+                    </button>
+
+                </form>
+
+            </div>
+
+
+            <div class="card">
+
+                <h2>Usuários cadastrados</h2>
+
+                <div id="listaUsuarios"></div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script src="js/usuarios.js"></script>
+
+</body>
+</html>

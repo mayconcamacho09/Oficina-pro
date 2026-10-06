@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Financeiro - Oficina Pro</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+<div class="sidebar-logo"><h2>🔧 OFICINA PRO</h2></div>
+<nav class="sidebar-menu">
+<a href="dashboard.html">📊 Dashboard</a>
+<a href="clientes.html">👥 Clientes</a>
+<a href="veiculos.html">🚗 Veículos</a>
+<a href="ordens.html">🔧 Ordens de Serviço</a>
+<a href="estoque.html">📦 Estoque</a>
+<a href="financeiro.html" class="active">💰 Financeiro</a>
+<a href="agenda.html">📅 Agenda</a>
+<a href="usuarios.html">⚙️ Usuários</a>
+<a href="#" onclick="sair();return false" class="logout">🚪 Sair</a>
+</nav>
+</aside>
+
+<main class="main">
+<div class="topbar">
+<div>
+<h1>Financeiro</h1>
+<p>Controle de faturamento, recebimentos, despesas e contas a receber</p>
+</div>
+<div class="user-info">👤 Administrador</div>
+</div>
+
+<div class="finance-filter content-box">
+<div class="finance-filter-row">
+<div class="form-group">
+<label for="periodo">Período</label>
+<select id="periodo">
+<option value="mes">Este mês</option>
+<option value="mesAnterior">Mês anterior</option>
+<option value="todos">Todo o período</option>
+</select>
+</div>
+<div class="form-group">
+<label for="dataInicio">Data inicial</label>
+<input id="dataInicio" type="date">
+</div>
+<div class="form-group">
+<label for="dataFim">Data final</label>
+<input id="dataFim" type="date">
+</div>
+<button class="btn btn-blue" id="btnFiltrar" type="button">Atualizar</button>
+</div>
+</div>
+
+<div class="content-box" style="margin-bottom:20px"><div class="content-header"><div><h2>🧮 Fechamento de caixa</h2><p class="table-subtitle" id="statusCaixa">Carregando caixa...</p></div><div><strong id="saldoCaixa">R$ 0,00</strong></div></div><div class="form-grid"><div class="form-group"><label>Valor de abertura</label><input id="valorAberturaCaixa" type="number" min="0" step="0.01" value="0"></div><div class="form-group"><label>Valor contado no fechamento</label><input id="valorFechamentoCaixa" type="number" min="0" step="0.01" placeholder="0,00"></div><div class="form-group"><label>Observação</label><input id="obsCaixa" placeholder="Ex.: diferença conferida"></div><div class="form-group" style="display:flex;gap:8px;align-items:end"><button class="btn btn-blue" type="button" id="btnAbrirCaixa">Abrir caixa</button><button class="btn btn-light" type="button" id="btnFecharCaixa">Fechar caixa</button></div></div><div id="historicoCaixa" class="table-container" style="margin-top:15px"></div></div>
+
+<div class="finance-cards">
+<div class="finance-card">
+<div class="finance-card-icon">💰</div>
+<div><span>Faturamento</span><strong id="faturamento">R$ 0,00</strong></div>
+</div>
+<div class="finance-card">
+<div class="finance-card-icon">📥</div>
+<div><span>Recebimentos</span><strong id="recebimentos">R$ 0,00</strong></div>
+</div>
+<div class="finance-card">
+<div class="finance-card-icon">📤</div>
+<div><span>Despesas</span><strong id="despesas">R$ 0,00</strong></div>
+</div>
+<div class="finance-card">
+<div class="finance-card-icon">📊</div>
+<div><span>Resultado</span><strong id="resultado">R$ 0,00</strong></div>
+</div>
+</div>
+
+<div class="finance-grid-two">
+<div class="content-box">
+<div class="content-header">
+<div>
+<h2>📊 Fluxo de caixa</h2>
+<p class="table-subtitle">Movimentações no período selecionado</p>
+</div>
+</div>
+<div class="cash-summary">
+<div><span>Entradas</span><strong id="entradasResumo">R$ 0,00</strong></div>
+<div><span>Saídas</span><strong id="saidasResumo">R$ 0,00</strong></div>
+<div><span>Saldo</span><strong id="saldoResumo">R$ 0,00</strong></div>
+</div>
+<div class="finance-bars">
+<div class="bar-group">
+<div class="bar-label"><span>Entradas</span><b id="percentEntrada">0%</b></div>
+<div class="bar-track"><div class="bar-fill entrada" id="barEntrada"></div></div>
+</div>
+<div class="bar-group">
+<div class="bar-label"><span>Saídas</span><b id="percentSaida">0%</b></div>
+<div class="bar-track"><div class="bar-fill saida" id="barSaida"></div></div>
+</div>
+</div>
+</div>
+
+<div class="content-box">
+<div class="content-header">
+<div>
+<h2>🧾 Contas a receber</h2>
+<p class="table-subtitle">OS ainda não quitadas</p>
+</div>
+<strong id="totalReceber" class="finance-highlight">R$ 0,00</strong>
+</div>
+<div class="table-container">
+<table>
+<thead><tr><th>OS</th><th>Cliente</th><th>Vencimento</th><th class="coluna-valor">Em aberto</th><th>Ação</th></tr></thead>
+<tbody id="listaReceber"></tbody>
+</table>
+</div>
+</div>
+</div>
+
+<div class="content-box">
+<div class="content-header">
+<div>
+<h2>📥 Registrar recebimento</h2>
+<p class="table-subtitle">Vincule o pagamento a uma Ordem de Serviço</p>
+</div>
+</div>
+<form id="formRecebimento" class="form-grid">
+<div class="form-group">
+<label for="osRecebimento">Ordem de Serviço *</label>
+<select id="osRecebimento" required></select>
+</div>
+<div class="form-group">
+<label for="dataRecebimento">Data do recebimento *</label>
+<input id="dataRecebimento" type="date" required>
+</div>
+<div class="form-group">
+<label for="valorRecebimento">Valor recebido *</label>
+<input id="valorRecebimento" type="number" min="0.01" step="0.01" required placeholder="0,00">
+</div>
+<div class="form-group">
+<label for="formaPagamento">Forma de pagamento</label>
+<select id="formaPagamento">
+<option>Pix</option>
+<option>Dinheiro</option>
+<option>Cartão de débito</option>
+<option>Cartão de crédito</option>
+<option>Transferência</option>
+<option>Boleto</option>
+<option>Outro</option>
+</select>
+</div>
+<div class="form-group">
+<label for="observacaoRecebimento">Observação</label>
+<input id="observacaoRecebimento" placeholder="Ex.: pagamento parcial">
+</div>
+<button class="btn btn-blue" type="submit">+ Registrar recebimento</button>
+</form>
+</div>
+
+<div class="content-box">
+<div class="content-header">
+<div>
+<h2>📤 Registrar despesa</h2>
+<p class="table-subtitle">Cadastre saídas que não estejam vinculadas a uma OS</p>
+</div>
+</div>
+<form id="formDespesa" class="form-grid">
+<div class="form-group">
+<label for="descricaoDespesa">Descrição *</label>
+<input id="descricaoDespesa" required placeholder="Ex.: Compra de peças">
+</div>
+<div class="form-group">
+<label for="categoriaDespesa">Categoria</label>
+<select id="categoriaDespesa">
+<option>Peças</option>
+<option>Fornecedor</option>
+<option>Salários</option>
+<option>Aluguel</option>
+<option>Energia</option>
+<option>Internet</option>
+<option>Impostos</option>
+<option>Manutenção</option>
+<option>Outros</option>
+</select>
+</div>
+<div class="form-group">
+<label for="valorDespesa">Valor *</label>
+<input id="valorDespesa" type="number" min="0.01" step="0.01" required placeholder="0,00">
+</div>
+<div class="form-group">
+<label for="dataDespesa">Data *</label>
+<input id="dataDespesa" type="date" required>
+</div>
+<button class="btn btn-blue" type="submit">+ Registrar despesa</button>
+</form>
+</div>
+
+<div class="content-box page-list">
+<div class="content-header">
+<div>
+<h2>📋 Movimentações</h2>
+<p class="table-subtitle" id="contadorMovimentacoes">0 movimentações</p>
+</div>
+<input class="table-search" id="buscaMovimentacoes" placeholder="🔎 Buscar descrição, cliente ou categoria...">
+</div>
+<div class="table-container">
+<table>
+<thead>
+<tr><th>Data</th><th>Descrição</th><th>Tipo</th><th>Categoria</th><th>Forma</th><th class="coluna-valor">Valor</th><th>Ações</th></tr>
+</thead>
+<tbody id="listaMovimentacoes"></tbody>
+</table>
+</div>
+</div>
+</main>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script src="js/financeiro.js"></script>
+</body>
+</html>

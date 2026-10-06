@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Dashboard - Oficina Pro
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+</head>
+
+<body>
+
+<div class="layout">
+
+
+    <!-- ========================================= -->
+    <!-- MENU LATERAL -->
+    <!-- ========================================= -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+
+            <h2>
+                🔧 OFICINA PRO
+            </h2>
+
+        </div>
+
+
+        <nav class="sidebar-menu">
+
+            <a
+                href="dashboard.html"
+                class="active"
+            >
+                📊 Dashboard
+            </a>
+
+            <a href="clientes.html">
+                👥 Clientes
+            </a>
+
+            <a href="veiculos.html">
+                🚗 Veículos
+            </a>
+
+            <a href="ordens.html">
+                🔧 Ordens de Serviço
+            </a>
+
+            <a href="estoque.html">
+                📦 Estoque
+            </a>
+
+            <a href="financeiro.html">
+                💰 Financeiro
+            </a>
+
+            <a href="agenda.html">
+                📅 Agenda
+            </a>
+
+            <a href="usuarios.html">
+                ⚙️ Usuários
+            </a>
+
+            <a href="relatorios.html">
+                📈 Relatórios
+            </a>
+
+            <a href="backup.html">
+                💾 Backup
+            </a>
+
+            <a
+                href="#"
+                onclick="sair(); return false;"
+                class="logout"
+            >
+                🚪 Sair
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- ========================================= -->
+    <!-- CONTEÚDO -->
+    <!-- ========================================= -->
+
+    <main class="main">
+
+
+        <!-- ===================================== -->
+        <!-- TOPO -->
+        <!-- ===================================== -->
+
+        <div class="topbar">
+
+            <div>
+
+                <h1>
+                    Dashboard
+                </h1>
+
+                <p>
+                    Visão geral da oficina
+                </p>
+
+            </div>
+
+
+            <div
+                class="user-info"
+                id="usuarioLogado"
+            >
+                👤 Carregando...
+            </div>
+
+        </div>
+
+
+        <!-- ===================================== -->
+        <!-- CARDS -->
+        <!-- ===================================== -->
+
+        <div class="cards">
+
+
+            <div class="card">
+
+                <div class="card-title">
+                    Clientes
+                </div>
+
+                <div
+                    class="card-value"
+                    id="totalClientes"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="card-title">
+                    Veículos
+                </div>
+
+                <div
+                    class="card-value"
+                    id="totalVeiculos"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="card-title">
+                    Ordens
+                </div>
+
+                <div
+                    class="card-value"
+                    id="totalOrdens"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="card-title">
+                    Estoque
+                </div>
+
+                <div
+                    class="card-value"
+                    id="totalProdutos"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+        </div>
+
+        <div class="v7-kpi-grid">
+            <div class="v7-kpi"><span>OS em aberto</span><strong id="osAbertas">0</strong></div>
+            <div class="v7-kpi"><span>Estoque crítico</span><strong id="estoqueCritico">0</strong></div>
+            <div class="v7-kpi"><span>Recebido hoje</span><strong id="recebidoHoje">R$ 0,00</strong></div>
+            <div class="v7-kpi"><span>Despesas hoje</span><strong id="despesaHoje">R$ 0,00</strong></div>
+            <div class="v7-kpi"><span>Faturamento acumulado</span><strong id="faturamentoTotal">R$ 0,00</strong></div>
+        </div>
+
+        <div class="v7-grid-two">
+            <div class="content-box">
+                <div class="content-header"><h2>📅 Agenda de hoje</h2><a href="agenda.html" class="btn btn-light">Abrir agenda</a></div>
+                <div id="agendaHoje" class="v7-agenda-list"></div>
+            </div>
+            <div class="content-box">
+                <div class="content-header"><h2>⚡ Atalhos</h2></div>
+                <div class="v7-shortcuts">
+                    <a href="ordens.html" class="btn btn-blue">+ Nova OS</a>
+                    <a href="clientes.html" class="btn btn-light">+ Cliente</a>
+                    <a href="estoque.html" class="btn btn-light">📦 Estoque</a>
+                    <a href="financeiro.html" class="btn btn-light">💰 Financeiro</a>
+                    <a href="relatorios.html" class="btn btn-light">📈 Relatórios</a>
+                    <a href="backup.html" class="btn btn-light">💾 Backup</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================================== -->
+        <!-- ORDENS RECENTES -->
+        <!-- ===================================== -->
+
+        <div class="content-box">
+
+
+            <div class="content-header">
+
+                <h2>
+                    Ordens recentes
+                </h2>
+
+
+                <a
+                    href="ordens.html"
+                    class="btn btn-blue"
+                >
+                    Nova OS
+                </a>
+
+            </div>
+
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                OS
+                            </th>
+
+                            <th>
+                                Cliente
+                            </th>
+
+                            <th>
+                                Veículo
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th class="coluna-valor">
+                                Total
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody
+                        id="tabelaOrdens"
+                    >
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+        </div>
+
+
+    </main>
+
+</div>
+
+
+<!-- ========================================= -->
+<!-- CONTROLE DO SISTEMA -->
+<!-- ========================================= -->
+
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+
+
+<!-- ========================================= -->
+<!-- DASHBOARD -->
+<!-- ========================================= -->
+
+<script src="js/dashboard.js"></script>
+
+
+<!-- ========================================= -->
+<!-- USUÁRIO LOGADO -->
+<!-- ========================================= -->
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const nome =
+            localStorage.getItem(
+                "nomeUsuarioLogado"
+            );
+
+        const perfil =
+            localStorage.getItem(
+                "perfilUsuarioLogado"
+            );
+
+        const usuario =
+            document.getElementById(
+                "usuarioLogado"
+            );
+
+
+        if (
+            usuario &&
+            nome &&
+            perfil
+        ) {
+
+            usuario.textContent =
+                `👤 ${nome} (${perfil})`;
+
+        }
+
+    }
+);
+
+</script>
+
+
+</body>
+
+</html>

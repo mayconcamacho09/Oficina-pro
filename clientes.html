@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clientes - Oficina Pro</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+<div class="sidebar-logo"><h2>🔧 OFICINA PRO</h2></div>
+<nav class="sidebar-menu">
+<a href="dashboard.html">📊 Dashboard</a>
+<a href="clientes.html" class="active">👥 Clientes</a>
+<a href="veiculos.html">🚗 Veículos</a>
+<a href="ordens.html">🔧 Ordens de Serviço</a>
+<a href="estoque.html">📦 Estoque</a>
+<a href="financeiro.html">💰 Financeiro</a>
+<a href="agenda.html">📅 Agenda</a>
+<a href="usuarios.html">⚙️ Usuários</a>
+<a href="#" onclick="sair();return false" class="logout">🚪 Sair</a>
+</nav>
+</aside>
+
+<main class="main">
+<div class="topbar">
+<div>
+<h1>Clientes</h1>
+<p>Gerencie os clientes cadastrados na oficina</p>
+</div>
+<div class="user-info">👤 Administrador</div>
+</div>
+
+<div class="content-box">
+<div class="content-header">
+<h2>Novo cliente</h2>
+</div>
+
+<form id="formCadastro" class="form-grid">
+<div class="form-group">
+<label for="nome">Nome completo *</label>
+<input id="nome" required placeholder="Ex.: João da Silva">
+</div>
+
+<div class="form-group">
+<label for="telefone">Telefone *</label>
+<input id="telefone" required placeholder="(00) 00000-0000" maxlength="15">
+</div>
+
+<div class="form-group">
+<label for="email">E-mail</label>
+<input id="email" type="email" placeholder="cliente@email.com">
+</div>
+
+<div class="form-group">
+<label for="cpf">CPF/CNPJ</label>
+<input id="cpf" placeholder="000.000.000-00">
+</div>
+
+<div class="form-group">
+<label for="endereco">Endereço</label>
+<input id="endereco" placeholder="Rua, número, bairro">
+</div>
+
+<div class="form-group">
+<label for="observacoes">Observações</label>
+<input id="observacoes" placeholder="Informações adicionais">
+</div>
+
+<button class="btn btn-blue" type="submit">+ Cadastrar cliente</button>
+</form>
+</div>
+
+<div class="content-box page-list">
+<div class="content-header">
+<div>
+<h2>Clientes cadastrados</h2>
+<p class="table-subtitle" id="contador">0 clientes</p>
+</div>
+<input class="table-search" id="busca" placeholder="🔎 Buscar cliente...">
+</div>
+
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>#</th><th>Nome</th><th>Telefone</th><th>E-mail</th><th>CPF/CNPJ</th><th>Ações</th>
+</tr>
+</thead>
+<tbody id="lista"></tbody>
+</table>
+</div>
+</div>
+</main>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script>
+const STORAGE = "clientes";
+const campos = ["nome","telefone","email","cpf","endereco","observacoes"];
+const form = document.getElementById("formCadastro");
+const lista = document.getElementById("lista");
+const busca = document.getElementById("busca");
+const contador = document.getElementById("contador");
+let editandoId = null;
+
+function dados() {
+    try { return JSON.parse(localStorage.getItem(STORAGE)) || []; }
+    catch { return []; }
+}
+function salvar(a) { localStorage.setItem(STORAGE, JSON.stringify(a)); }
+
+function escapar(valor) {
+    return String(valor ?? "").replace(/[&<>"']/g, c => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+    }[c]));
+}
+
+function render() {
+    const todos = dados();
+    const termo = busca.value.toLowerCase().trim();
+    const filtrados = todos.filter(item =>
+        [item.nome,item.telefone,item.email,item.cpf].join(" ").toLowerCase().includes(termo)
+    );
+
+    contador.textContent = `${todos.length} ${todos.length === 1 ? "cliente" : "clientes"}`;
+    lista.innerHTML = "";
+
+    if (!filtrados.length) {
+        lista.innerHTML = `<tr><td colspan="6" class="empty-state">Nenhum cliente encontrado.</td></tr>`;
+        return;
+    }
+
+    filtrados.forEach((item, i) => {
+        const indice = todos.findIndex(x => x.id === item.id);
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${i + 1}</td>
+            <td><strong>${escapar(item.nome)}</strong></td>
+            <td>${escapar(item.telefone)}</td>
+            <td>${escapar(item.email)}</td>
+            <td>${escapar(item.cpf)}</td>
+            <td class="actions">
+                <button class="btn-small btn-edit" onclick="editar(${item.id})">Editar</button>
+                <button class="btn-danger" onclick="excluir(${indice})">Excluir</button>
+            </td>`;
+        lista.appendChild(tr);
+    });
+}
+
+function limparFormulario() {
+    form.reset();
+    editandoId = null;
+    form.querySelector("button[type=submit]").textContent = "+ Cadastrar cliente";
+    document.querySelector(".content-header h2").textContent = "Novo cliente";
+}
+
+form.addEventListener("submit", e => {
+    e.preventDefault();
+    const listaDados = dados();
+    const item = {};
+    campos.forEach(c => item[c] = document.getElementById(c).value.trim());
+
+    if (editandoId !== null) {
+        const index = listaDados.findIndex(x => x.id === editandoId);
+        if (index >= 0) {
+            listaDados[index] = {...listaDados[index], ...item};
+        }
+    } else {
+        item.id = Date.now();
+        item.criadoEm = new Date().toISOString();
+        listaDados.push(item);
+    }
+
+    salvar(listaDados);
+    limparFormulario();
+    render();
+});
+
+function editar(id) {
+    const item = dados().find(x => x.id === id);
+    if (!item) return;
+    campos.forEach(c => document.getElementById(c).value = item[c] || "");
+    editandoId = id;
+    form.querySelector("button[type=submit]").textContent = "Salvar alterações";
+    document.querySelector(".content-header h2").textContent = "Editar cliente";
+    window.scrollTo({top: 0, behavior: "smooth"});
+}
+
+function excluir(indice) {
+    const listaDados = dados();
+    const item = listaDados[indice];
+    if (!item) return;
+    if (!confirm(`Excluir o cliente "${item.nome}"?`)) return;
+
+    const veiculos = JSON.parse(localStorage.getItem("veiculos") || "[]");
+    const possuiVeiculos = veiculos.some(v => v.clienteId === item.id);
+    if (possuiVeiculos && !confirm("Este cliente possui veículos vinculados. Deseja excluir mesmo assim?")) return;
+
+    listaDados.splice(indice, 1);
+    salvar(listaDados);
+    render();
+}
+
+document.getElementById("telefone").addEventListener("input", e => {
+    let v = e.target.value.replace(/\D/g,"").slice(0,11);
+    if (v.length <= 10) v = v.replace(/(\d{2})(\d)/,"($1) $2").replace(/(\d{4})(\d)/,"$1-$2");
+    else v = v.replace(/(\d{2})(\d)/,"($1) $2").replace(/(\d{5})(\d)/,"$1-$2");
+    e.target.value = v;
+});
+busca.addEventListener("input", render);
+render();
+</script>
+</body>
+</html>

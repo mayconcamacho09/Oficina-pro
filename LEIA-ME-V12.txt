@@ -1,0 +1,25 @@
+OFICINA PRO v12 — OPERAÇÃO LOCAL / HD EXTERNO
+
+OBJETIVO
+Esta versão foi preparada para uso local em um computador autorizado da oficina, com o projeto e o banco SQLite podendo ficar em um HD externo.
+
+PRIMEIRO USO
+1. Instale Node.js 20+ no computador autorizado (somente uma vez).
+2. Copie/extrair esta pasta para o HD externo.
+3. Abra um terminal na pasta do Oficina Pro.
+4. Execute: npm install
+5. Execute: npm start
+6. Abra: http://localhost:3000
+7. Na primeira abertura, a tela de CONFIGURAÇÃO INICIAL permite cadastrar a oficina e criar o primeiro ADMINISTRADOR.
+
+DADOS
+O banco SQLite fica em backend/oficina.sqlite. Faça backups periódicos. O HD externo não deve ser a única cópia dos dados.
+
+REDE
+Para outros computadores da mesma rede acessarem, o servidor pode ser iniciado no computador que hospeda o HD e a porta 3000 pode ser publicada na rede local conforme a política da empresa. Não altere firewall/rede sem autorização do responsável de TI.
+
+SEGURANÇA
+Defina JWT_SECRET no arquivo .env com pelo menos 32 caracteres. Não compartilhe a senha do administrador.
+
+MIGRAÇÃO FUTURA
+A estrutura foi mantida em Node.js + SQLite para facilitar futura migração para VPS/PostgreSQL quando o sistema passar a atender clientes externamente.

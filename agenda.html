@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Agenda - Oficina Pro</title>
+
+    <link rel="stylesheet"
+          href="css/style.css">
+
+</head>
+
+
+<body>
+
+
+<div class="layout">
+
+
+    <!-- ========================================= -->
+    <!-- SIDEBAR -->
+    <!-- ========================================= -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+
+            <h2>🔧 OFICINA PRO</h2>
+
+        </div>
+
+
+        <nav class="sidebar-menu">
+
+            <a href="dashboard.html">
+                📊 Dashboard
+            </a>
+
+            <a href="clientes.html">
+                👥 Clientes
+            </a>
+
+            <a href="veiculos.html">
+                🚗 Veículos
+            </a>
+
+            <a href="ordens.html">
+                🔧 Ordens de Serviço
+            </a>
+
+            <a href="estoque.html">
+                📦 Estoque
+            </a>
+
+            <a href="financeiro.html">
+                💰 Financeiro
+            </a>
+
+            <a href="agenda.html">
+                📅 Agenda
+            </a>
+
+            <a href="#"
+               onclick="sair(); return false"
+               class="logout">
+
+                🚪 Sair
+
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+
+    <!-- ========================================= -->
+    <!-- CONTEÚDO PRINCIPAL -->
+    <!-- ========================================= -->
+
+    <main class="main">
+
+
+        <!-- ===================================== -->
+        <!-- TOPO -->
+        <!-- ===================================== -->
+
+        <div class="topbar">
+
+            <h1>
+                Agenda
+            </h1>
+
+            <div class="user-info">
+
+                👤 Administrador
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ===================================== -->
+        <!-- CADASTRO -->
+        <!-- ===================================== -->
+
+        <div class="content-box">
+
+
+            <div class="content-header">
+
+                <h2>
+                    Novo Agenda
+                </h2>
+
+            </div>
+
+
+
+            <form id="formCadastro"
+                  class="form-grid">
+
+
+                <!-- CLIENTE -->
+
+                <div class="form-group">
+
+                    <label for="cliente">
+                        Cliente
+                    </label>
+
+                    <input
+                        id="cliente"
+                        type="text"
+                        placeholder="Nome do cliente"
+                    >
+
+                </div>
+
+
+
+                <!-- DATA -->
+
+                <div class="form-group">
+
+                    <label for="data">
+                        Data
+                    </label>
+
+                    <input
+                        id="data"
+                        type="text"
+                        placeholder="dd/mm/aaaa"
+                        maxlength="10"
+                        inputmode="numeric"
+                        autocomplete="off"
+                    >
+
+                </div>
+
+
+
+                <!-- HORÁRIO -->
+
+                <div class="form-group">
+
+                    <label for="horario">
+                        Horário
+                    </label>
+
+                    <input
+                        id="horario"
+                        type="text"
+                        placeholder="08:00"
+                        maxlength="5"
+                        inputmode="numeric"
+                        autocomplete="off"
+                    >
+
+                </div>
+
+
+
+                <!-- SERVIÇO -->
+
+                <div class="form-group">
+
+                    <label for="servico">
+                        Serviço
+                    </label>
+
+                    <input
+                        id="servico"
+                        type="text"
+                        placeholder="Descrição"
+                    >
+
+                </div>
+
+
+
+                <!-- BOTÃO -->
+
+                <button
+                    class="btn btn-blue"
+                    type="submit">
+
+                    + Cadastrar
+
+                </button>
+
+
+            </form>
+
+
+        </div>
+
+
+
+        <!-- ===================================== -->
+        <!-- LISTAGEM -->
+        <!-- ===================================== -->
+
+        <div class="content-box page-list">
+
+
+            <div class="content-header">
+
+                <h2>
+                    Registros cadastrados
+                </h2>
+
+            </div>
+
+
+
+            <div class="table-container">
+
+
+                <table>
+
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                #
+                            </th>
+
+                            <th>
+                                Cliente
+                            </th>
+
+                            <th>
+                                Data
+                            </th>
+
+                            <th>
+                                Horário
+                            </th>
+
+                            <th>
+                                Serviço
+                            </th>
+
+                            <th>
+                                Ações
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+
+                    <tbody id="lista">
+
+                    </tbody>
+
+
+                </table>
+
+
+            </div>
+
+
+        </div>
+
+
+    </main>
+
+
+</div>
+
+
+
+<!-- ========================================= -->
+<!-- APP.JS -->
+<!-- ========================================= -->
+
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+
+
+
+<script>
+
+
+// =============================================
+// CONFIGURAÇÕES
+// =============================================
+
+const STORAGE = "agenda";
+
+
+const fields = [
+
+    "cliente",
+    "data",
+    "horario",
+    "servico"
+
+];
+
+
+
+const form =
+    document.getElementById("formCadastro");
+
+
+const lista =
+    document.getElementById("lista");
+
+
+
+// =============================================
+// OBTER DADOS
+// =============================================
+
+function dados() {
+
+    try {
+
+        return JSON.parse(
+            localStorage.getItem(STORAGE)
+        ) || [];
+
+    } catch (erro) {
+
+        console.error(
+            "Erro ao carregar agenda:",
+            erro
+        );
+
+        return [];
+
+    }
+
+}
+
+
+
+// =============================================
+// SALVAR DADOS
+// =============================================
+
+function salvar(agenda) {
+
+    localStorage.setItem(
+        STORAGE,
+        JSON.stringify(agenda)
+    );
+
+}
+
+
+
+// =============================================
+// FORMATA DATA
+// =============================================
+
+document
+    .getElementById("data")
+    .addEventListener("input", function () {
+
+
+        let valor =
+            this.value.replace(/\D/g, "");
+
+
+        // Limita para 8 números
+
+        if (valor.length > 8) {
+
+            valor =
+                valor.substring(0, 8);
+
+        }
+
+
+        // DD/MM/AAAA
+
+        if (valor.length >= 5) {
+
+            this.value =
+                valor.substring(0, 2) +
+                "/" +
+                valor.substring(2, 4) +
+                "/" +
+                valor.substring(4, 8);
+
+        }
+
+        else if (valor.length >= 3) {
+
+            this.value =
+                valor.substring(0, 2) +
+                "/" +
+                valor.substring(2);
+
+        }
+
+        else {
+
+            this.value =
+                valor;
+
+        }
+
+    });
+
+
+
+// =============================================
+// FORMATA HORÁRIO
+// =============================================
+
+document
+    .getElementById("horario")
+    .addEventListener("input", function () {
+
+
+        let valor =
+            this.value.replace(/\D/g, "");
+
+
+        // Limita para 4 números
+
+        if (valor.length > 4) {
+
+            valor =
+                valor.substring(0, 4);
+
+        }
+
+
+        // HH:MM
+
+        if (valor.length >= 3) {
+
+            this.value =
+                valor.substring(0, 2) +
+                ":" +
+                valor.substring(2, 4);
+
+        }
+
+        else {
+
+            this.value =
+                valor;
+
+        }
+
+    });
+
+
+
+// =============================================
+// VALIDAR DATA
+// =============================================
+
+function dataValida(data) {
+
+
+    const partes =
+        data.split("/");
+
+
+    if (partes.length !== 3) {
+
+        return false;
+
+    }
+
+
+    const dia =
+        parseInt(partes[0], 10);
+
+
+    const mes =
+        parseInt(partes[1], 10);
+
+
+    const ano =
+        parseInt(partes[2], 10);
+
+
+    if (
+        isNaN(dia) ||
+        isNaN(mes) ||
+        isNaN(ano)
+    ) {
+
+        return false;
+
+    }
+
+
+    if (
+        dia < 1 ||
+        dia > 31
+    ) {
+
+        return false;
+
+    }
+
+
+    if (
+        mes < 1 ||
+        mes > 12
+    ) {
+
+        return false;
+
+    }
+
+
+    if (
+        ano < 1900 ||
+        ano > 2100
+    ) {
+
+        return false;
+
+    }
+
+
+    return true;
+
+}
+
+
+
+// =============================================
+// VALIDAR HORÁRIO
+// =============================================
+
+function horarioValido(horario) {
+
+
+    const partes =
+        horario.split(":");
+
+
+    if (partes.length !== 2) {
+
+        return false;
+
+    }
+
+
+    const hora =
+        parseInt(partes[0], 10);
+
+
+    const minuto =
+        parseInt(partes[1], 10);
+
+
+    if (
+        isNaN(hora) ||
+        isNaN(minuto)
+    ) {
+
+        return false;
+
+    }
+
+
+    if (
+        hora < 0 ||
+        hora > 23
+    ) {
+
+        return false;
+
+    }
+
+
+    if (
+        minuto < 0 ||
+        minuto > 59
+    ) {
+
+        return false;
+
+    }
+
+
+    return true;
+
+}
+
+
+
+// =============================================
+// RENDERIZAR AGENDA
+// =============================================
+
+function render() {
+
+
+    const agenda =
+        dados();
+
+
+    lista.innerHTML = "";
+
+
+    agenda.forEach(function (item, i) {
+
+
+        const tr =
+            document.createElement("tr");
+
+
+        tr.innerHTML =
+
+            "<td>" +
+            (i + 1) +
+            "</td>" +
+
+
+            "<td>" +
+            String(item.cliente ?? "") +
+            "</td>" +
+
+
+            "<td>" +
+            String(item.data ?? "") +
+            "</td>" +
+
+
+            "<td>" +
+            String(item.horario ?? "") +
+            "</td>" +
+
+
+            "<td>" +
+            String(item.servico ?? "") +
+            "</td>" +
+
+
+            "<td>" +
+
+            '<button ' +
+
+            'class="btn-danger" ' +
+
+            'onclick="excluir(' +
+            i +
+            ')">' +
+
+            'Excluir' +
+
+            '</button>' +
+
+            "</td>";
+
+
+        lista.appendChild(tr);
+
+    });
+
+}
+
+
+
+// =============================================
+// CADASTRAR
+// =============================================
+
+form.addEventListener(
+    "submit",
+    function (e) {
+
+
+        e.preventDefault();
+
+
+        const cliente =
+            document
+                .getElementById("cliente")
+                .value
+                .trim();
+
+
+        const data =
+            document
+                .getElementById("data")
+                .value
+                .trim();
+
+
+        const horario =
+            document
+                .getElementById("horario")
+                .value
+                .trim();
+
+
+        const servico =
+            document
+                .getElementById("servico")
+                .value
+                .trim();
+
+
+
+        // =====================================
+        // VALIDAÇÕES
+        // =====================================
+
+        if (
+            !cliente ||
+            !data ||
+            !horario ||
+            !servico
+        ) {
+
+            alert(
+                "Preencha todos os campos."
+            );
+
+            return;
+
+        }
+
+
+
+        // =====================================
+        // VALIDA DATA
+        // =====================================
+
+        if (!dataValida(data)) {
+
+            alert(
+                "Digite uma data válida no formato DD/MM/AAAA.\n\nExemplo: 20/09/2026"
+            );
+
+            return;
+
+        }
+
+
+
+        // =====================================
+        // VALIDA HORÁRIO
+        // =====================================
+
+        if (!horarioValido(horario)) {
+
+            alert(
+                "Digite um horário válido no formato HH:MM.\n\nExemplo: 15:30"
+            );
+
+            return;
+
+        }
+
+
+
+        // =====================================
+        // OBTÉM AGENDA
+        // =====================================
+
+        const agenda =
+            dados();
+
+
+
+        // =====================================
+        // NOVO REGISTRO
+        // =====================================
+
+        const item = {
+
+            id: Date.now(),
+
+            cliente:
+                cliente,
+
+            data:
+                data,
+
+            horario:
+                horario,
+
+            servico:
+                servico
+
+        };
+
+
+
+        // =====================================
+        // ADICIONA
+        // =====================================
+
+        agenda.push(item);
+
+
+
+        // =====================================
+        // SALVA
+        // =====================================
+
+        salvar(agenda);
+
+
+
+        // =====================================
+        // LIMPA FORMULÁRIO
+        // =====================================
+
+        form.reset();
+
+
+
+        // =====================================
+        // ATUALIZA LISTA
+        // =====================================
+
+        render();
+
+
+    }
+);
+
+
+
+// =============================================
+// EXCLUIR
+// =============================================
+
+function excluir(i) {
+
+
+    const agenda =
+        dados();
+
+
+    if (
+        !agenda[i]
+    ) {
+
+        return;
+
+    }
+
+
+    const confirmar =
+        confirm(
+            'Deseja excluir este agendamento?'
+        );
+
+
+    if (!confirmar) {
+
+        return;
+
+    }
+
+
+    agenda.splice(
+        i,
+        1
+    );
+
+
+    salvar(agenda);
+
+
+    render();
+
+}
+
+
+
+// =============================================
+// CARREGA AO ABRIR A PÁGINA
+// =============================================
+
+render();
+
+
+</script>
+
+
+</body>
+
+</html>

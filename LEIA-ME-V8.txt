@@ -1,0 +1,30 @@
+OFICINA PRO v8 - BACKEND + DADOS COMPARTILHADOS
+
+REQUISITOS
+- Node.js 18 ou superior.
+
+COMO INICIAR
+1. Abra um terminal nesta pasta "Oficina Pro".
+2. Execute: node server.js
+3. Abra: http://localhost:3000
+
+LOGIN INICIAL
+Usuário: admin
+Senha: admin123
+
+A v8 adiciona um servidor HTTP, autenticação por sessão, banco persistente em data/database.json, sincronização automática dos módulos e auditoria básica.
+
+IMPORTANTE
+- O banco JSON é adequado para uso local/pequena implantação. Para produção com vários usuários simultâneos, recomenda-se migrar para PostgreSQL/MySQL.
+- Altere a senha do administrador assim que entrar no sistema.
+- O frontend mantém cache local para funcionar mesmo se o servidor cair; quando o servidor estiver disponível, os dados são sincronizados.
+
+ATUALIZAÇÃO — ESTOQUE INTEGRADO À ORDEM DE SERVIÇO
+
+- Ao adicionar uma peça na OS, o sistema agora mostra as peças cadastradas no estoque em uma lista.
+- Ao selecionar a peça, nome e preço de venda são preenchidos automaticamente.
+- O estoque disponível é mostrado na própria linha do item.
+- Peças vinculadas ao estoque são baixadas automaticamente quando a OS entra em status de Aprovado, Em execução, Aguardando peça, Finalizado ou Entregue.
+- Se uma OS já aprovada for editada, o estoque é ajustado somente pela diferença da quantidade.
+- Se uma OS que consumiu peças for excluída, as peças são devolvidas ao estoque.
+- Peças digitadas manualmente continuam disponíveis, mas não alteram o estoque.

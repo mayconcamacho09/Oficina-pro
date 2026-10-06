@@ -1,0 +1,17 @@
+OFICINA PRO v10 — OPERACIONAL
+
+Novidades:
+- Caixa centralizado: abertura, movimentações e fechamento com conferência.
+- Histórico centralizado de estoque, incluindo entradas, saídas e consumo/devolução por OS.
+- Permissões de escrita por perfil no servidor.
+- Backup do servidor inclui estoque e caixa.
+- Restauração de backup pelo servidor, restrita ao Administrador.
+- Auditoria das operações de caixa e estoque.
+- Banco SQLite continua centralizado no servidor.
+
+Execução:
+1. Copie .env.example para .env.
+2. Defina JWT_SECRET com pelo menos 32 caracteres e ADMIN_PASSWORD forte.
+3. npm install
+4. npm start
+5. Acesse http://localhost:3000
